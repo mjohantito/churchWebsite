@@ -2,7 +2,10 @@ import { createContext, useCallback, useContext, useId, useRef, useState, type F
 import { useTranslation } from 'react-i18next';
 import { Dialog } from '../Dialog';
 import { Icon } from '../Icon';
-import { submitForm, type FormType } from '../../lib/submitForm';
+import { SubmitError, submitForm, type FormType as DbFormType } from '../../data/forms';
+
+/** Forms that open in a dialog on the homepage (baptism and contact get their own pages later). */
+export type FormType = Extract<DbFormType, 'new_member' | 'prayer' | 'choir'>;
 
 /* ------------------------------------------------------------------ */
 /* Field definitions per form                                          */
@@ -27,11 +30,11 @@ const FORMS: Record<FormType, { i18n: 'newMember' | 'prayer' | 'choir'; fields: 
     i18n: 'newMember',
     fields: [NAME, PHONE, EMAIL, { name: 'message', kind: 'textarea', required: false }],
   },
-  prayer_request: {
+  prayer: {
     i18n: 'prayer',
     fields: [NAME, PHONE, EMAIL, { name: 'request', kind: 'textarea', required: true, hint: 'request' }],
   },
-  choir_signup: {
+  choir: {
     i18n: 'choir',
     fields: [NAME, PHONE, EMAIL, { name: 'voicePart', kind: 'select', required: false }],
   },
@@ -81,12 +84,13 @@ export function FormDialogProvider({ children }: { children: ReactNode }) {
 
 /* ------------------------------------------------------------------ */
 
-type Status = 'idle' | 'submitting' | 'success' | 'error';
+type Status = 'idle' | 'submitting' | 'success' | 'error' | 'throttled';
 
 function FormBody({ type }: { type: FormType }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const uid = useId();
   const def = FORMS[type];
+  const [honeypot, setHoneypot] = useState('');
   const copy = def.i18n;
   const [values, setValues] = useState<Values>({});
   const [errors, setErrors] = useState<Errors>({});
@@ -103,7 +107,7 @@ function FormBody({ type }: { type: FormType }) {
       if (!val('phone')) e.phone = t('forms.errors.phoneRequired');
       else if (!PHONE_RE.test(val('phone'))) e.phone = t('forms.errors.phoneInvalid');
       if (val('email') && !EMAIL_RE.test(val('email'))) e.email = t('forms.errors.emailInvalid');
-      if (type === 'prayer_request' && !val('request')) e.request = t('forms.errors.requestRequired');
+      if (type === 'prayer' && !val('request')) e.request = t('forms.errors.requestRequired');
       return e;
     },
     [t, type],
@@ -128,13 +132,21 @@ function FormBody({ type }: { type: FormType }) {
     }
     setStatus('submitting');
     try {
-      const payload: Record<string, string> = {};
-      for (const f of def.fields) payload[f.name] = (values[f.name] ?? '').trim();
-      await submitForm(type, payload);
+      const v = (n: FieldName) => (values[n] ?? '').trim();
+      await submitForm(type, {
+        name: v('name'),
+        phone: v('phone'),
+        email: v('email'),
+        message: type === 'prayer' ? v('request') : v('message'),
+        extra: type === 'choir' && v('voicePart') ? { voice_part: v('voicePart') } : undefined,
+        website: honeypot,
+        lang: i18n.resolvedLanguage,
+      });
       setStatus('success');
       requestAnimationFrame(() => successRef.current?.focus());
-    } catch {
-      setStatus('error');
+    } catch (err) {
+      // Never show raw errors: only a friendly message per case.
+      setStatus(err instanceof SubmitError && err.code === 'throttled' ? 'throttled' : 'error');
     }
   };
 
@@ -243,12 +255,26 @@ function FormBody({ type }: { type: FormType }) {
           );
         })}
 
-        {status === 'error' && (
+        {(status === 'error' || status === 'throttled') && (
           <p className="form-alert" role="alert">
             <Icon name="danger-circle-linear" className="h-5 w-5 shrink-0" />
-            {t('forms.errorSubmit')}
+            {status === 'throttled' ? t('forms.throttled') : t('forms.errorSubmit')}
           </p>
         )}
+
+        {/* Honeypot: hidden from people and assistive tech; bots tend to fill it. */}
+        <div className="honeypot" aria-hidden="true">
+          <label htmlFor={`${uid}-website`}>{t('forms.honeypot')}</label>
+          <input
+            id={`${uid}-website`}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
+        </div>
 
         <p className="flex gap-2 text-sm text-stone-600">
           <Icon name="phone-linear" className="mt-0.5 h-4 w-4 shrink-0" />

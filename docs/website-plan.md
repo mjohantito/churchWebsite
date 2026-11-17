@@ -81,10 +81,13 @@ Admin page: staff login, then manage sermons, daily bread, announcements, roster
 ## Build order
 
 1. Homepage only (frontend, mock data, form UI with stub submit) — DONE, with a revision pass for reference layout, typography and times
-2. Other pages (frontend, mock data, stub forms) — NEXT
-3. Supabase: tables, form submissions, staff auth
-4. Admin page
+2. Other pages (frontend, mock data, stub forms): partly done. Daily Bread, Pengumuman and Jadwal Petugas Ibadah were built with step 3 on real data. Church Services, Baptisan and Contact Us are still "Coming soon" stubs.
+3. Supabase: tables, form submissions, staff auth — DONE (see docs/backend-plan.md)
+4. Admin page — DONE (/admin, roles admin + editor; see docs/backend-plan.md)
 5. Email notification, deploy
+   - 5a. Deploy preparation (Vercel config, security headers, SEO, robots/sitemap, env checks) — DONE (see docs/deploy.md)
+   - 5b. Staff email notifications for new form submissions — NEXT
+   - 5c. First production deploy and custom domain
 
 ## Open items
 

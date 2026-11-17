@@ -1014,3 +1014,126 @@ html.lenis body {
     transform: rotate(360deg);
   }
 }
+
+/* ================================================================== */
+/* Data pages: states, daily bread, announcements, roster             */
+/* ================================================================== */
+@layer components {
+  .skeleton {
+    border-radius: 4px;
+    background: var(--gray-200);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton {
+      animation: skeleton-pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  .audio-panel {
+    max-width: 38rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 0.85rem;
+    background: var(--surface);
+  }
+
+  .archive-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-height: 44px;
+    padding: 0.85rem 0;
+    transition: color 0.2s;
+  }
+  .archive-link:hover {
+    color: var(--gray-600);
+  }
+  .archive-link[aria-current='page'] {
+    padding-left: 0.85rem;
+    border-left: 2px solid var(--ink);
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 1.1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .filter-chip:hover {
+    border-color: var(--ink);
+  }
+  .filter-chip[aria-current='page'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--gray-200);
+    border-radius: 0.85rem;
+    background: var(--surface);
+  }
+  .table-scroll:focus-visible {
+    box-shadow: var(--focus);
+  }
+  .roster-table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  .roster-table th,
+  .roster-table td {
+    padding: 0.95rem 1.1rem;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  .roster-table tbody tr:last-child th,
+  .roster-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .roster-table thead th {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gray-600);
+    background: var(--gray-100);
+  }
+  .roster-table tbody th {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Honeypot: off-screen, not display:none (some bots skip hidden fields) */
+  .honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@layer components {
+  .prose-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .prose-link:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+

@@ -174,7 +174,7 @@ export function Hero() {
           <button type="button" className="btn btn--solid" aria-haspopup="dialog" onClick={() => openForm('new_member')}>
             {t('hero.ctaNew')}
           </button>
-          <button type="button" className="btn btn--outline" aria-haspopup="dialog" onClick={() => openForm('prayer_request')}>
+          <button type="button" className="btn btn--outline" aria-haspopup="dialog" onClick={() => openForm('prayer')}>
             {t('hero.ctaPrayer')}
           </button>
         </div>

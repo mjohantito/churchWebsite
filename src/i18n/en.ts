@@ -5,6 +5,21 @@ type Shape<T> = { [K in keyof T]: T[K] extends string ? string : Shape<T[K]> };
 const en: Shape<Dictionary> = {
   meta: {
     title: 'Setia Bakti Baptist Church · Kediri',
+    siteName: 'Setia Bakti Baptist Church',
+    pageTitle: '{{page}} · Setia Bakti Baptist Church',
+    ogImageAlt: 'Setia Bakti Baptist Church, Kediri',
+    descriptions: {
+      home: 'Setia Bakti Baptist Church in Kediri. Sunday services, Wednesday night prayer, the latest sermon, and community for every age.',
+      dailyBread: 'Daily devotionals from Setia Bakti Baptist Church: read or listen every day.',
+      dailyBreadDate: 'Setia Bakti Baptist Church daily devotional for {{date}}.',
+      announcements: 'The latest announcements from KPW and other groups at Setia Bakti Baptist Church.',
+      roster: 'The weekly service duty roster of Setia Bakti Baptist Church.',
+      services: 'Service times and information at Setia Bakti Baptist Church, Kediri.',
+      baptism: 'Baptism information and registration at Setia Bakti Baptist Church.',
+      contact: 'Contact Setia Bakti Baptist Church in Kediri, East Java.',
+      sermons: 'Sermons from Setia Bakti Baptist Church.',
+      staff: 'Staff area of Setia Bakti Baptist Church.',
+    },
   },
   a11y: {
     skip: 'Skip to main content',
@@ -69,14 +84,14 @@ const en: Shape<Dictionary> = {
       title: 'Sunday Service',
       timesLabel: 'Service times',
       materialLabel: 'Next Sunday’s material',
-      readingLabel: 'Reading',
-      preacherLabel: 'Preacher',
+      materialEmpty: 'Next Sunday’s material has not been published yet.',
     },
     prayer: {
       tag: 'Wednesday night',
       title: 'Wednesday Night Prayer',
       timesLabel: 'Prayer time',
       listLabel: 'This week’s prayer list',
+      listEmpty: 'This week’s prayer list has not been published yet.',
     },
     choir: {
       tag: 'Choir',
@@ -85,7 +100,6 @@ const en: Shape<Dictionary> = {
         'Love to sing? Join us in serving through worship. No experience needed, just a heart to praise God together.',
       cta: 'Join the choir',
     },
-    sampleNote: 'Sample data. Church staff will fill this in.',
   },
 
   sermon: {
@@ -103,6 +117,7 @@ const en: Shape<Dictionary> = {
     slidesSoon: 'Slides coming soon',
     all: 'See all sermons',
     iframeTitle: 'Sermon video: {{title}}',
+    empty: 'The latest sermon will appear here soon.',
   },
 
   ministries: {
@@ -177,8 +192,79 @@ const en: Shape<Dictionary> = {
     adults: 'Adult fellowship gathering',
   },
 
+  states: {
+    loading: 'Loading…',
+    error: 'Sorry, this could not be loaded. Please check your connection.',
+    retry: 'Try again',
+  },
+
+  dailyBread: {
+    eyebrow: 'Daily devotional',
+    script: 'Daily',
+    intro: 'A short devotional every day: listen to the audio or read the text.',
+    todayLabel: 'Today',
+    listen: 'Listen to the devotional',
+    audioUnsupported: 'Your browser cannot play this audio.',
+    noAudio: 'Audio for this devotional is not available yet.',
+    archive: 'Devotional archive',
+    empty: 'No devotionals have been published yet.',
+    emptyDate: 'There is no devotional for this date yet.',
+    invalidDate: 'That date is not valid.',
+    backToToday: 'Back to today’s devotional',
+    readingLabel: 'Reading',
+  },
+
+  announcements: {
+    eyebrow: 'Church news',
+    intro: 'Announcements from KPW and other church groups, newest first.',
+    filterLabel: 'Filter by group',
+    all: 'All',
+    empty: 'No announcements yet.',
+    emptyGroup: 'No announcements from this group yet.',
+    postedOn: 'Posted',
+  },
+
+  roster: {
+    eyebrow: 'Serving at worship',
+    intro: 'Who is serving at each service this week.',
+    weekOf: 'Week of {{range}}',
+    prevWeek: 'Previous week',
+    nextWeek: 'Next week',
+    thisWeek: 'This week',
+    roleHeader: 'Role',
+    caption: 'Service duty roster, week of {{range}}',
+    services: {
+      sun_am: 'Sunday morning',
+      sun_pm: 'Sunday evening',
+      wed: 'Wednesday night',
+    },
+    empty: 'The roster for this week has not been filled in yet.',
+    unassigned: 'Not yet assigned',
+  },
+
+  auth: {
+    title: 'Staff sign-in',
+    intro: 'This page is for church staff only.',
+    email: 'Email',
+    password: 'Password',
+    submit: 'Sign in',
+    submitting: 'Checking…',
+    invalid: 'Wrong email or password.',
+    network: 'Could not connect. Please try again shortly.',
+    unavailable: 'Sign-in is not available in mock data mode (VITE_USE_MOCK).',
+    signOut: 'Sign out',
+    checking: 'Checking session…',
+    notAuthorizedTitle: 'Not authorized',
+    notAuthorized: 'This account is not registered as staff. Please contact the church admin.',
+    profileError: 'Staff details could not be loaded. Please try again.',
+  },
+
+  // Staff admin text lives in src/i18n/admin-*.ts and loads with the admin chunk.
+
   forms: {
-    staffNote: 'Church staff will contact you using the details you give.',
+    staffNote: 'Staff will contact you using these details.',
+    throttled: 'Your form was just sent. Please wait 30 seconds before sending another.',
+    honeypot: 'Leave this field empty',
     required: 'required',
     optional: 'optional',
     submit: 'Send',

@@ -53,7 +53,6 @@ export function setLanguage(lang: Lang) {
 export function syncDocumentLanguage(lang: string) {
   if (typeof document === 'undefined') return;
   document.documentElement.lang = lang;
-  document.title = i18n.t('meta.title');
 }
 
 export default i18n;

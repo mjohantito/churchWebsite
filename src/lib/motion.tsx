@@ -104,10 +104,23 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   return <ScrollContext.Provider value={api}>{children}</ScrollContext.Provider>;
 }
 
-export function useScroll() {
-  const ctx = useContext(ScrollContext);
-  if (!ctx) throw new Error('useScroll must be used inside SmoothScrollProvider');
-  return ctx;
+/** Plain fallback where Lenis is not mounted (e.g. the admin area). */
+let plainLocks = 0;
+const plainScroll: ScrollApi = {
+  lock() {
+    plainLocks += 1;
+    document.documentElement.classList.add('scroll-locked');
+  },
+  unlock() {
+    plainLocks = Math.max(0, plainLocks - 1);
+    if (plainLocks === 0) document.documentElement.classList.remove('scroll-locked');
+  },
+  scrollToTop: () => window.scrollTo({ top: 0 }),
+  scrollToElement: (el) => el.scrollIntoView(),
+};
+
+export function useScroll(): ScrollApi {
+  return useContext(ScrollContext) ?? plainScroll;
 }
 
 /* ------------------------------------------------------------------ */

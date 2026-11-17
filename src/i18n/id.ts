@@ -2,8 +2,24 @@
 // Keep keys identical between the two files: en.ts is type-checked against this one.
 
 const id = {
+  // Page titles + descriptions (browser tab, search results, link previews)
   meta: {
     title: 'Setia Bakti Baptist Church · Kediri',
+    siteName: 'Setia Bakti Baptist Church',
+    pageTitle: '{{page}} · Setia Bakti Baptist Church',
+    ogImageAlt: 'Setia Bakti Baptist Church, Kediri',
+    descriptions: {
+      home: 'Gereja Baptis Setia Bakti di Kota Kediri. Ibadah Minggu, doa Rabu malam, khotbah terbaru, dan komunitas untuk setiap usia.',
+      dailyBread: 'Renungan harian Setia Bakti Baptist Church: baca atau dengarkan renungan setiap hari.',
+      dailyBreadDate: 'Renungan harian Setia Bakti Baptist Church untuk {{date}}.',
+      announcements: 'Pengumuman terbaru dari KPW dan kelompok lain di Setia Bakti Baptist Church.',
+      roster: 'Jadwal petugas ibadah mingguan Setia Bakti Baptist Church.',
+      services: 'Jadwal dan informasi ibadah di Setia Bakti Baptist Church, Kediri.',
+      baptism: 'Informasi dan pendaftaran baptisan di Setia Bakti Baptist Church.',
+      contact: 'Hubungi Setia Bakti Baptist Church di Kota Kediri, Jawa Timur.',
+      sermons: 'Kumpulan khotbah Setia Bakti Baptist Church.',
+      staff: 'Halaman staf Setia Bakti Baptist Church.',
+    },
   },
   a11y: {
     skip: 'Langsung ke konten utama',
@@ -71,14 +87,14 @@ const id = {
       title: 'Ibadah Minggu',
       timesLabel: 'Jam ibadah',
       materialLabel: 'Bahan Minggu depan',
-      readingLabel: 'Bacaan',
-      preacherLabel: 'Pembicara',
+      materialEmpty: 'Bahan Minggu depan belum diterbitkan.',
     },
     prayer: {
       tag: 'Rabu malam',
       title: 'Doa Rabu Malam',
       timesLabel: 'Jam doa',
       listLabel: 'Pokok doa minggu ini',
+      listEmpty: 'Pokok doa minggu ini belum diterbitkan.',
     },
     choir: {
       tag: 'Paduan suara',
@@ -87,7 +103,6 @@ const id = {
         'Suka bernyanyi? Bergabunglah melayani lewat pujian. Tidak perlu pengalaman, cukup kerinduan untuk memuji Tuhan bersama.',
       cta: 'Gabung paduan suara',
     },
-    sampleNote: 'Contoh data. Akan diisi oleh staf gereja.',
   },
 
   sermon: {
@@ -105,6 +120,7 @@ const id = {
     slidesSoon: 'Slide menyusul',
     all: 'Lihat semua khotbah',
     iframeTitle: 'Video khotbah: {{title}}',
+    empty: 'Khotbah terbaru akan segera ditampilkan di sini.',
   },
 
   ministries: {
@@ -180,8 +196,80 @@ const id = {
     adults: 'Persekutuan jemaat dewasa',
   },
 
+  states: {
+    loading: 'Memuat…',
+    error: 'Maaf, data belum bisa dimuat. Periksa koneksi Anda.',
+    retry: 'Coba lagi',
+  },
+
+  dailyBread: {
+    eyebrow: 'Renungan harian',
+    script: 'Harian',
+    intro: 'Renungan singkat setiap hari: dengarkan audionya atau baca teksnya.',
+    todayLabel: 'Hari ini',
+    listen: 'Dengarkan renungan',
+    audioUnsupported: 'Browser Anda tidak dapat memutar audio ini.',
+    noAudio: 'Audio untuk renungan ini belum tersedia.',
+    archive: 'Arsip renungan',
+    empty: 'Belum ada renungan yang diterbitkan.',
+    emptyDate: 'Belum ada renungan untuk tanggal ini.',
+    invalidDate: 'Tanggal tidak valid.',
+    backToToday: 'Kembali ke renungan hari ini',
+    readingLabel: 'Bacaan',
+  },
+
+  announcements: {
+    eyebrow: 'Kabar jemaat',
+    intro: 'Pengumuman dari KPW dan kelompok lain di gereja, terbaru di atas.',
+    filterLabel: 'Saring berdasarkan kelompok',
+    all: 'Semua',
+    empty: 'Belum ada pengumuman.',
+    emptyGroup: 'Belum ada pengumuman dari kelompok ini.',
+    postedOn: 'Diterbitkan',
+  },
+
+  roster: {
+    eyebrow: 'Pelayanan ibadah',
+    intro: 'Siapa yang bertugas di setiap ibadah minggu ini.',
+    weekOf: 'Minggu {{range}}',
+    prevWeek: 'Minggu sebelumnya',
+    nextWeek: 'Minggu berikutnya',
+    thisWeek: 'Minggu ini',
+    roleHeader: 'Tugas',
+    caption: 'Jadwal petugas ibadah, minggu {{range}}',
+    services: {
+      sun_am: 'Minggu pagi',
+      sun_pm: 'Minggu sore',
+      wed: 'Rabu malam',
+    },
+    empty: 'Jadwal untuk minggu ini belum diisi.',
+    unassigned: 'Belum diisi',
+  },
+
+  auth: {
+    title: 'Masuk staf',
+    intro: 'Halaman ini hanya untuk staf gereja.',
+    email: 'Email',
+    password: 'Kata sandi',
+    submit: 'Masuk',
+    submitting: 'Memeriksa…',
+    invalid: 'Email atau kata sandi salah.',
+    network: 'Tidak dapat terhubung. Coba lagi sebentar lagi.',
+    unavailable: 'Login tidak tersedia dalam mode data contoh (VITE_USE_MOCK).',
+    signOut: 'Keluar',
+    checking: 'Memeriksa sesi…',
+    notAuthorizedTitle: 'Tidak diizinkan',
+    notAuthorized: 'Akun ini belum terdaftar sebagai staf. Hubungi admin gereja.',
+    profileError: 'Data staf belum bisa dimuat. Coba lagi.',
+  },
+
+  // Staff admin text lives in src/i18n/admin-*.ts and loads with the admin chunk.
+
   forms: {
-    staffNote: 'Staf gereja akan menghubungi Anda melalui kontak yang Anda berikan.',
+    // consent line shown on every form
+    staffNote: 'Staf akan menghubungi Anda melalui kontak yang Anda berikan.',
+    throttled: 'Formulir baru saja terkirim. Mohon tunggu 30 detik sebelum mengirim lagi.',
+    honeypot: 'Jangan isi kolom ini',
     required: 'wajib',
     optional: 'opsional',
     submit: 'Kirim',

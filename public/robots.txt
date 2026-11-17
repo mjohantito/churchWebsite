@@ -1,0 +1,5 @@
+# Setia Bakti Baptist Church
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login

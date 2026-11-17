@@ -1,18 +1,43 @@
 import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
+import { dehydrate, QueryClientProvider } from '@tanstack/react-query';
 import { App } from './App';
-import { DEFAULT_LANG, initI18n } from './i18n';
+import i18n, { DEFAULT_LANG, initI18n } from './i18n';
+import { createQueryClient } from './lib/queryClient';
+import { prefetchHomepage } from './data/queries';
+import { PUBLIC_ROUTES, routeMeta } from './lib/seo';
 
-// Used only at build time (scripts/prerender.mjs) to write the static HTML
-// of the homepage, so it is complete with JavaScript disabled.
-export function render(url: string) {
+export { PUBLIC_ROUTES };
+
+/** Title / description / robots for a route, in the default language (ID). */
+export function meta(url: string) {
   initI18n(DEFAULT_LANG);
-  return renderToString(
+  return routeMeta(url, i18n.t);
+}
+
+/**
+ * Build time only (scripts/prerender.mjs): renders a route to static HTML so
+ * it is readable with JavaScript disabled. The homepage is rendered with real
+ * data; other pages render their shell (header, footer, page frame).
+ * If the database is unreachable at build time, the page still renders and
+ * the browser fetches the data instead.
+ */
+export async function render(url: string) {
+  initI18n(DEFAULT_LANG);
+  const queryClient = createQueryClient();
+  const failed = url === '/' ? await prefetchHomepage(queryClient) : 0;
+
+  const state = dehydrate(queryClient);
+  const html = renderToString(
     <StrictMode>
-      <StaticRouter location={url}>
-        <App />
-      </StaticRouter>
+      <QueryClientProvider client={queryClient}>
+        <StaticRouter location={url}>
+          <App />
+        </StaticRouter>
+      </QueryClientProvider>
     </StrictMode>,
   );
+  queryClient.clear(); // drop cache timers so the build process can exit
+  return { html, state, failed };
 }

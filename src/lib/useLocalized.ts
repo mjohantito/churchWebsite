@@ -4,11 +4,11 @@ import type { Localized } from '../data/types';
 import { isLang } from '../i18n';
 import { formatTime, formatTimes } from '../data/churchInfo';
 
-/** Picks the current language from bilingual { id, en } database values. */
+/** Picks the current language from bilingual { id, en } values; English falls back to Indonesian. */
 export function useLocalized() {
   const { i18n } = useTranslation();
   const lang = isLang(i18n.resolvedLanguage) ? i18n.resolvedLanguage : 'id';
-  const pick = useCallback((value: Localized) => value[lang], [lang]);
+  const pick = useCallback((value: Localized) => (lang === 'en' && value.en ? value.en : value.id), [lang]);
   const formatDate = useCallback(
     (iso: string) =>
       new Intl.DateTimeFormat(lang === 'id' ? 'id-ID' : 'en-GB', {
