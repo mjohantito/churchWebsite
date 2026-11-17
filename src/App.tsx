@@ -16,6 +16,7 @@ import { PageMeta } from './components/PageMeta';
 // Pages other than the homepage load on demand (smaller first download).
 const DailyBreadPage = lazy(() => import('./pages/DailyBreadPage').then((m) => ({ default: m.DailyBreadPage })));
 const AnnouncementsPage = lazy(() => import('./pages/AnnouncementsPage').then((m) => ({ default: m.AnnouncementsPage })));
+const ChurchServicesPage = lazy(() => import('./pages/ChurchServicesPage').then((m) => ({ default: m.ChurchServicesPage })));
 const RosterPage = lazy(() => import('./pages/RosterPage').then((m) => ({ default: m.RosterPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 // The whole staff admin area is one separate chunk: it never grows the public bundle.
@@ -85,6 +86,7 @@ function PublicSite() {
               <Route path="/pengumuman" element={<AnnouncementsPage />} />
               <Route path="/pengumuman/:id" element={<AnnouncementsPage />} />
               <Route path="/jadwal-petugas" element={<RosterPage />} />
+              <Route path="/church-services" element={<ChurchServicesPage />} />
               {/* Staff only. Not linked from the public navigation. */}
               <Route path="/login" element={<LoginPage />} />
               {STUB_ROUTES.map((r) => (

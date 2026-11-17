@@ -1,5 +1,5 @@
 // Reusable building blocks for every admin screen.
-import { useId, useState, type ReactNode, type InputHTMLAttributes, type TextareaHTMLAttributes, type SelectHTMLAttributes } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode, type InputHTMLAttributes, type TextareaHTMLAttributes, type SelectHTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '../components/Icon';
@@ -189,6 +189,58 @@ export function Bilingual({ render }: { render: (lang: 'id' | 'en') => ReactNode
   );
 }
 
+/**
+ * Indonesian / English as tabs (one language visible at a time). Arrow keys
+ * move between tabs. Switches to the tab that has an error after a failed save.
+ */
+export function BilingualTabs({ render, errorIn }: { render: (lang: 'id' | 'en') => ReactNode; errorIn?: 'id' | 'en' | null }) {
+  const { t } = useTranslation();
+  const base = useId();
+  const [tab, setTab] = useState<'id' | 'en'>('id');
+  const refs = { id: useRef<HTMLButtonElement>(null), en: useRef<HTMLButtonElement>(null) };
+  useEffect(() => {
+    if (errorIn) setTab(errorIn);
+  }, [errorIn]);
+  const langs = ['id', 'en'] as const;
+  return (
+    <div>
+      <div role="tablist" aria-label={t('admin.lang.tabs')} className="lang-tabs">
+        {langs.map((l) => (
+          <button key={l} ref={refs[l]} type="button" role="tab" id={`${base}-${l}`} aria-controls={`${base}-${l}-panel`}
+            aria-selected={tab === l} tabIndex={tab === l ? 0 : -1} className="lang-tab"
+            onClick={() => setTab(l)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const next = l === 'id' ? 'en' : 'id';
+                setTab(next);
+                refs[next].current?.focus();
+              }
+            }}>
+            {t(l === 'id' ? 'admin.lang.idTab' : 'admin.lang.enTab')}
+          </button>
+        ))}
+      </div>
+      {langs.map((l) => (
+        <div key={l} role="tabpanel" id={`${base}-${l}-panel`} aria-labelledby={`${base}-${l}`} hidden={tab !== l} className="space-y-5 pt-4">
+          {render(l)}
+          {l === 'en' && <p className="field-hint">{t('admin.lang.enHint')}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** On/off switch (button with role="switch"). */
+export function Switch({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} disabled={disabled} className="switch" onClick={() => onChange(!checked)}>
+      <span className="switch__track" aria-hidden="true"><span className="switch__thumb" /></span>
+      <span>{label}</span>
+    </button>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Status                                                               */
 /* ------------------------------------------------------------------ */
@@ -205,11 +257,13 @@ export function StatusBadge({ status }: { status: 'draft' | 'published' }) {
 export function ConfirmDialog({
   open, title, body, confirmLabel, cancelLabel, danger = false, busy = false, onConfirm, onCancel,
 }: { open: boolean; title: string; body: string; confirmLabel: string; cancelLabel: string; danger?: boolean; busy?: boolean; onConfirm: () => void; onCancel: () => void }) {
+  // Unique ids: a screen often renders two confirm dialogs (delete + unsaved changes).
+  const id = useId();
   return (
-    <Dialog open={open} onClose={onCancel} labelledBy="confirm-title" describedBy="confirm-body">
+    <Dialog open={open} onClose={onCancel} labelledBy={`${id}-title`} describedBy={`${id}-body`}>
       <div className="px-6 pb-6 pt-7 sm:px-8">
-        <h2 id="confirm-title" className="text-xl font-bold">{title}</h2>
-        <p id="confirm-body" className="mt-2 text-stone-700">{body}</p>
+        <h2 id={`${id}-title`} className="confirm-title text-xl font-bold">{title}</h2>
+        <p id={`${id}-body`} className="mt-2 text-stone-700">{body}</p>
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           <Button onClick={onCancel} autoFocus>{cancelLabel}</Button>
           <Button variant={danger ? 'danger' : 'primary'} busy={busy} onClick={onConfirm}>{confirmLabel}</Button>

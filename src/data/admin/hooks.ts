@@ -9,15 +9,17 @@ import { deleteSubmission, getSubmission, inboxSummary, listSubmissions, updateS
 import { getRosterCells, listRoles, saveRole, saveRosterCells, type DutyRole, type RosterCells } from './roster';
 import { listAllGroups, saveGroup, type Group } from './groups';
 import { listStaff } from './staff';
+import { deleteService, getService, listAllServices, saveService, swapServiceOrder, updateServiceFlags, type ServiceInput, type TimeInput } from './services';
 
 /** Public query keys (src/data/queries.ts) affected by each admin table. */
-const PUBLIC_KEYS: Record<ContentTable | 'groups' | 'roster', string[][]> = {
+const PUBLIC_KEYS: Record<ContentTable | 'groups' | 'roster' | 'services', string[][]> = {
   daily_bread: [['daily-bread']],
   sermons: [['sermons']],
   weekly_items: [['weekly']],
   announcements: [['announcements']],
   groups: [['groups'], ['announcements']],
   roster: [['roster']],
+  services: [['services']],
 };
 
 export const adminKeys = {
@@ -31,6 +33,8 @@ export const adminKeys = {
   roster: (week: string) => ['admin', 'roster', week] as const,
   groups: ['admin', 'groups'] as const,
   staff: ['admin', 'staff'] as const,
+  services: ['admin', 'services', 'list'] as const,
+  service: (id: string) => ['admin', 'services', 'item', id] as const,
 };
 
 function useInvalidate() {
@@ -126,3 +130,38 @@ export function useSaveGroup() {
 }
 
 export const useStaffList = () => useQuery({ queryKey: adminKeys.staff, queryFn: listStaff });
+
+/* ---------------- church services ---------------- */
+
+export const useAdminServices = () => useQuery({ queryKey: adminKeys.services, queryFn: listAllServices });
+export const useAdminService = (id: string | null) =>
+  useQuery({ queryKey: adminKeys.service(id ?? 'new'), queryFn: () => getService(id!), enabled: Boolean(id), staleTime: 0 });
+
+export function useSaveService() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, service, times }: { id: string | null; service: ServiceInput; times: TimeInput[] }) => saveService(id, service, times),
+    onSuccess: () => invalidate('services', PUBLIC_KEYS.services),
+  });
+}
+
+export function useUpdateServiceFlags() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Parameters<typeof updateServiceFlags>[1] }) => updateServiceFlags(id, patch),
+    onSuccess: () => invalidate('services', PUBLIC_KEYS.services),
+  });
+}
+
+export function useSwapServices() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: (v: { a: { id: string }; aIndex: number; b: { id: string }; bIndex: number }) => swapServiceOrder(v.a, v.aIndex, v.b, v.bIndex),
+    onSettled: () => invalidate('services', PUBLIC_KEYS.services),
+  });
+}
+
+export function useDeleteService() {
+  const invalidate = useInvalidate();
+  return useMutation({ mutationFn: deleteService, onSuccess: () => invalidate('services', PUBLIC_KEYS.services) });
+}

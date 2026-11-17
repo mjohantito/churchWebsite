@@ -77,32 +77,29 @@ const id = {
     headingBefore: 'Mari beribadah',
     headingScript: 'Bersama',
     headingAfter: '',
-    intro: 'Tiga cara untuk hadir dan terlibat setiap minggu.',
+    // Service names, times and descriptions are managed in /admin/services.
+    intro: 'Cara untuk hadir dan terlibat setiap minggu.',
     carouselLabel: 'Kartu ibadah',
     prev: 'Kartu sebelumnya',
     next: 'Kartu berikutnya',
     cardOf: 'Kartu {{current}} dari {{total}}',
+    timesLabel: 'Waktu',
+    ctaDefault: 'Selengkapnya',
     sunday: {
-      tag: 'Minggu',
-      title: 'Ibadah Minggu',
-      timesLabel: 'Jam ibadah',
       materialLabel: 'Bahan Minggu depan',
       materialEmpty: 'Bahan Minggu depan belum diterbitkan.',
     },
     prayer: {
-      tag: 'Rabu malam',
-      title: 'Doa Rabu Malam',
-      timesLabel: 'Jam doa',
       listLabel: 'Pokok doa minggu ini',
       listEmpty: 'Pokok doa minggu ini belum diterbitkan.',
     },
-    choir: {
-      tag: 'Paduan suara',
-      title: 'Paduan Suara',
-      invite:
-        'Suka bernyanyi? Bergabunglah melayani lewat pujian. Tidak perlu pengalaman, cukup kerinduan untuk memuji Tuhan bersama.',
-      cta: 'Gabung paduan suara',
-    },
+  },
+
+  churchServices: {
+    eyebrow: 'Ibadah & persekutuan',
+    intro: 'Jadwal ibadah dan persekutuan di Setia Bakti. Semua waktu dalam WIB. Anda selalu disambut.',
+    location: 'Lokasi',
+    empty: 'Jadwal ibadah sedang diperbarui.',
   },
 
   sermon: {

@@ -1443,3 +1443,15 @@ html.lenis body {
 main:has(> .archive-band:last-child) + footer {
   margin-top: 0;
 }
+
+@layer components {
+  .time-chip__label {
+    margin-left: 0.2rem;
+    font-family: theme('fontFamily.sans');
+    font-weight: 500;
+    font-size: 0.78rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--gray-600);
+  }
+}

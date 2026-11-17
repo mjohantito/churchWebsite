@@ -74,32 +74,28 @@ const en: Shape<Dictionary> = {
     headingBefore: 'Come and worship',
     headingScript: 'Together',
     headingAfter: '',
-    intro: 'Three ways to gather and take part each week.',
+    intro: 'Ways to gather and take part each week.',
     carouselLabel: 'Service cards',
     prev: 'Previous card',
     next: 'Next card',
     cardOf: 'Card {{current}} of {{total}}',
+    timesLabel: 'Times',
+    ctaDefault: 'Learn more',
     sunday: {
-      tag: 'Sunday',
-      title: 'Sunday Service',
-      timesLabel: 'Service times',
       materialLabel: 'Next Sunday’s material',
       materialEmpty: 'Next Sunday’s material has not been published yet.',
     },
     prayer: {
-      tag: 'Wednesday night',
-      title: 'Wednesday Night Prayer',
-      timesLabel: 'Prayer time',
       listLabel: 'This week’s prayer list',
       listEmpty: 'This week’s prayer list has not been published yet.',
     },
-    choir: {
-      tag: 'Choir',
-      title: 'Choir',
-      invite:
-        'Love to sing? Join us in serving through worship. No experience needed, just a heart to praise God together.',
-      cta: 'Join the choir',
-    },
+  },
+
+  churchServices: {
+    eyebrow: 'Worship & fellowship',
+    intro: 'Service times at Setia Bakti. All times are in WIB (Western Indonesia Time). You are always welcome.',
+    location: 'Location',
+    empty: 'The service schedule is being updated.',
   },
 
   sermon: {

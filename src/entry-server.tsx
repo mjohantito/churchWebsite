@@ -5,7 +5,7 @@ import { dehydrate, QueryClientProvider } from '@tanstack/react-query';
 import { App } from './App';
 import i18n, { DEFAULT_LANG, initI18n } from './i18n';
 import { createQueryClient } from './lib/queryClient';
-import { prefetchHomepage } from './data/queries';
+import { prefetchHomepage, prefetchServices } from './data/queries';
 import { PUBLIC_ROUTES, routeMeta } from './lib/seo';
 
 export { PUBLIC_ROUTES };
@@ -26,7 +26,9 @@ export function meta(url: string) {
 export async function render(url: string) {
   initI18n(DEFAULT_LANG);
   const queryClient = createQueryClient();
-  const failed = url === '/' ? await prefetchHomepage(queryClient) : 0;
+  const failed = url === '/'
+    ? await prefetchHomepage(queryClient)
+    : await prefetchServices(queryClient).then(() => 0, () => 1); // footer times on every page
 
   const state = dehydrate(queryClient);
   const html = renderToString(

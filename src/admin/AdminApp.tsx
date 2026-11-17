@@ -27,6 +27,8 @@ const SermonEdit = lazy(() => import('./screens/SermonEdit'));
 const WeeklyEdit = lazy(() => import('./screens/WeeklyEdit'));
 const AnnouncementEdit = lazy(() => import('./screens/AnnouncementEdit'));
 const Roster = lazy(() => import('./screens/Roster'));
+const Services = lazy(() => import('./screens/Services'));
+const ServiceEdit = lazy(() => import('./screens/ServiceEdit'));
 const Groups = lazy(() => import('./screens/Groups'));
 const Staff = lazy(() => import('./screens/Staff'));
 
@@ -57,6 +59,8 @@ export default function AdminApp() {
               <Route path="/admin/weekly/:id" element={<WeeklyEdit />} />
               <Route path="/admin/announcements" element={<AnnouncementList />} />
               <Route path="/admin/announcements/:id" element={<AnnouncementEdit />} />
+              <Route path="/admin/services" element={<Services />} />
+              <Route path="/admin/services/:id" element={<ServiceEdit />} />
               <Route path="/admin/roster" element={<Roster />} />
               <Route path="/admin/groups" element={<AdminOnly><Groups /></AdminOnly>} />
               <Route path="/admin/staff" element={<AdminOnly><Staff /></AdminOnly>} />

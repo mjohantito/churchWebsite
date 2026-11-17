@@ -348,3 +348,88 @@
 }
 .toast__close:hover { background: rgb(255 255 255 / 0.15); }
 .toast__close:focus-visible { box-shadow: 0 0 0 2px #fff; }
+
+/* ID/EN tabs */
+.lang-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--gray-200); }
+.lang-tab {
+  min-height: 44px;
+  padding: 0 1rem;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-weight: 700;
+  color: var(--gray-600);
+}
+.lang-tab[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* Switch */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  font-weight: 500;
+  text-align: left;
+}
+.switch__track {
+  position: relative;
+  width: 2.6rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--gray-300);
+  transition: background-color 0.15s;
+}
+.switch__thumb {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+  transition: transform 0.15s;
+}
+.switch[aria-checked='true'] .switch__track { background: var(--accent); }
+.switch[aria-checked='true'] .switch__thumb { transform: translateX(1.1rem); }
+.switch:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  .switch__track, .switch__thumb { transition: none; }
+}
+
+/* Services list */
+.service-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
+  padding: 1rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.85rem;
+  background: var(--surface);
+}
+.service-row.is-hidden { border-style: dashed; background: var(--paper); }
+.service-row .icon-button:disabled { opacity: 0.3; }
+.lock-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--gray-700);
+}
+
+/* Times editor */
+.time-row {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.85rem;
+  background: var(--paper);
+}
+@media (min-width: 900px) {
+  .time-row { grid-template-columns: 11rem 9.5rem 1fr 1fr auto; align-items: end; }
+}
+.time-pick { display: flex; gap: 0.35rem; align-items: center; }
+.time-pick select { min-width: 0; }

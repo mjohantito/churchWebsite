@@ -5,7 +5,7 @@ import { Empty, Loading, LoadError } from '../../components/QueryState';
 import { Icon } from '../../components/Icon';
 import { useRoles, useRosterCells, useSaveRole, useSaveRoster } from '../../data/admin/hooks';
 import { getRosterCells, type DutyRole, type DutyService, type RosterCells } from '../../data/admin/roster';
-import { CHURCH_INFO } from '../../data/churchInfo';
+import { useServiceList } from '../../data/queries';
 import { useAuth } from '../../auth/AuthContext';
 import { addDays, isIsoDate, jakartaToday, mondayOf } from '../../lib/dates';
 import { useLocalized } from '../../lib/useLocalized';
@@ -15,11 +15,6 @@ import { useAdminError } from '../useAdminError';
 import { useUnsavedGuard } from '../useUnsavedGuard';
 
 const SERVICES: DutyService[] = ['sun_am', 'sun_pm', 'wed'];
-const SERVICE_TIME: Record<DutyService, string> = {
-  sun_am: CHURCH_INFO.services.sunday[0],
-  sun_pm: CHURCH_INFO.services.sunday[1],
-  wed: CHURCH_INFO.services.wednesdayPrayer[0],
-};
 
 export default function Roster() {
   const { t } = useTranslation();
@@ -48,7 +43,12 @@ export default function Roster() {
   const fmt = (iso: string, opts: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat(lang === 'id' ? 'id-ID' : 'en-GB', { ...opts, timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
   const range = `${fmt(week, { weekday: 'short', day: 'numeric', month: 'short' })} – ${fmt(addDays(week, 6), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}`;
-  const serviceLabel = (s: DutyService) => t(`admin.roster.services.${s}`, { time: time(SERVICE_TIME[s]) });
+  // Column times follow the services managed in /admin/services.
+  const { services } = useServiceList();
+  const sunday = services.find((x) => x.kind === 'sunday')?.times.filter((x) => x.day === 0) ?? [];
+  const wednesday = services.flatMap((x) => x.times).find((x) => x.day === 3);
+  const serviceTime: Record<DutyService, string | undefined> = { sun_am: sunday[0]?.time, sun_pm: sunday[1]?.time, wed: wednesday?.time };
+  const serviceLabel = (s: DutyService) => t(`admin.roster.services.${s}`, { time: serviceTime[s] ? time(serviceTime[s]!) : '' }).trim();
   const goTo = (iso: string) => setParams(iso === thisWeek ? {} : { week: mondayOf(iso) });
 
   const setCell = (roleId: string, s: DutyService, v: string) =>

@@ -6,6 +6,7 @@ import { useOpenForm } from '../components/forms/FormDialog';
 import { gsap, MOTION_OK_QUERY } from '../lib/motion';
 import { useLocalized } from '../lib/useLocalized';
 import { CHURCH_INFO } from '../data/churchInfo';
+import { useSundayTimes } from '../data/queries';
 
 /**
  * Three stacked uppercase lines + one oversized script word.
@@ -56,6 +57,7 @@ export function Hero() {
   const { t } = useTranslation();
   const openForm = useOpenForm();
   const { pick, times } = useLocalized();
+  const sundayTimes = useSundayTimes();
   const root = useRef<HTMLElement>(null);
 
   // Composed intro + pointer parallax. The HTML is complete without this.
@@ -193,7 +195,7 @@ export function Hero() {
           {/* Our one small monochrome detail where the reference had its map. */}
           <p data-hero="detail" data-intro className="arch-detail">
             <Icon name="clock-circle-linear" className="h-4 w-4 shrink-0" />
-            <span>{t('hero.serviceNote', { times: times(CHURCH_INFO.services.sunday) })}</span>
+            <span>{t('hero.serviceNote', { times: times(sundayTimes) })}</span>
           </p>
         </div>
       </div>

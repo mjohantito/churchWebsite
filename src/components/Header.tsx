@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { NAV } from '../config/site';
-import { CHURCH_INFO } from '../data/churchInfo';
+import { useSundayTimes } from '../data/queries';
 import { useLocalized } from '../lib/useLocalized';
 import { Dialog } from './Dialog';
 import { Icon } from './Icon';
@@ -26,6 +26,7 @@ export function Wordmark() {
 export function Header() {
   const { t } = useTranslation();
   const { times } = useLocalized();
+  const sundayTimes = useSundayTimes();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -99,7 +100,7 @@ export function Header() {
           </nav>
           <div className="mt-auto space-y-5 pt-10">
             <p className="text-sm text-stone-600">
-              {t('footer.sunday')} · {times(CHURCH_INFO.services.sunday)}
+              {t('footer.sunday')} · {times(sundayTimes)}
             </p>
             <LanguageToggle />
           </div>

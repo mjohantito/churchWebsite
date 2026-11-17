@@ -55,7 +55,8 @@ for (const route of PUBLIC_ROUTES) {
   const { html, state, failed } = await render(route);
   failedTotal += failed;
   let out = withSeo(template, route).replace('<!--app-html-->', html);
-  if (route === '/') out = out.replace('</body>', stateScript(state));
+  // Every page carries its build-time data (services for the footer; homepage content on /).
+  out = out.replace('</body>', stateScript(state));
   const file = route === '/' ? `${dist}/index.html` : `${dist}${route}/index.html`;
   mkdirSync(file.slice(0, file.lastIndexOf('/')), { recursive: true });
   writeFileSync(file, out);

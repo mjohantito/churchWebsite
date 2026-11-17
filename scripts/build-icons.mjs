@@ -15,6 +15,7 @@ const ICONS = [
   'refresh-linear', 'book-bookmark-linear', 'global-linear', 'users-group-rounded-linear',
   'user-plus-rounded-linear', 'book-2-linear', 'document-text-linear', 'heart-linear',
   'play-bold', 'pause-bold', 'archive-linear',
+  'lock-keyhole-linear', 'pen-2-linear', 'trash-bin-minimalistic-linear', 'add-circle-linear', 'arrow-up-linear', 'arrow-down-linear',
 ];
 
 const out = { prefix: 'solar', width: solar.width ?? 24, height: solar.height ?? 24, icons: {} };

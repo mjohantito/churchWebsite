@@ -5,6 +5,8 @@ import { getNextWeeklyItem } from './weekly';
 import { getCurrentDailyBread, getDailyBreadByDate, listDailyBread } from './dailyBread';
 import { listAnnouncements, listGroups } from './announcements';
 import { getRoster } from './roster';
+import { listServices } from './services';
+import { FALLBACK_SERVICES } from './churchInfo';
 import type { WeeklyKind } from './types';
 
 // Keys never contain "today": the prerendered cache must match on hydration.
@@ -17,6 +19,7 @@ export const queryKeys = {
   groups: ['groups'] as const,
   announcements: (group: string | null) => ['announcements', group ?? 'all'] as const,
   roster: (weekStart: string) => ['roster', weekStart] as const,
+  services: ['services'] as const,
 };
 
 /** Homepage data, fetched at build time for the static HTML. Returns how many failed. */
@@ -25,8 +28,32 @@ export async function prefetchHomepage(client: QueryClient): Promise<number> {
     client.fetchQuery({ queryKey: queryKeys.latestSermon, queryFn: getLatestSermon, retry: 1 }),
     client.fetchQuery({ queryKey: queryKeys.nextWeekly('sunday_material'), queryFn: () => getNextWeeklyItem('sunday_material'), retry: 1 }),
     client.fetchQuery({ queryKey: queryKeys.nextWeekly('prayer_list'), queryFn: () => getNextWeeklyItem('prayer_list'), retry: 1 }),
+    prefetchServices(client),
   ]);
   return results.filter((r) => r.status === 'rejected').length;
+}
+
+/** Services are shown in the footer of every page, so every pre-rendered page gets them. */
+export function prefetchServices(client: QueryClient) {
+  return client.fetchQuery({ queryKey: queryKeys.services, queryFn: listServices, retry: 1 });
+}
+
+/** Raw query (loading / error states) for pages that list services. */
+export const useServices = () => useQuery({ queryKey: queryKeys.services, queryFn: listServices });
+
+/**
+ * Services with the offline fallback: the stored copy in churchInfo.ts is
+ * shown while loading or if the request fails, so times are never blank.
+ */
+export function useServiceList() {
+  const q = useServices();
+  return { services: q.data ?? FALLBACK_SERVICES, isFallback: !q.data, isPending: q.isPending, isError: q.isError };
+}
+
+/** Times of the fixed Sunday service (fallback while loading). */
+export function useSundayTimes() {
+  const { services } = useServiceList();
+  return (services.find((s) => s.kind === 'sunday') ?? FALLBACK_SERVICES[0]).times;
 }
 
 export const useLatestSermon = () => useQuery({ queryKey: queryKeys.latestSermon, queryFn: getLatestSermon });

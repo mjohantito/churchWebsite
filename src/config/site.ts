@@ -1,4 +1,5 @@
-// Site navigation. Church facts (times, address, scripture) live in src/data/churchInfo.ts.
+// Site navigation. Church facts (address, scripture) live in src/data/churchInfo.ts;
+// service times are managed in /admin/services.
 
 // Single source for the header, mobile menu, footer and router.
 export const NAV = [
@@ -12,7 +13,6 @@ export const NAV = [
 
 // Pages not built yet: rendered with the "Coming soon" PageHeader.
 export const STUB_ROUTES = [
-  { path: '/church-services', key: 'nav.services' },
   { path: '/baptisan', key: 'nav.baptism' },
   { path: '/contact-us', key: 'nav.contact' },
   { path: '/sermons', key: 'nav.sermons' },

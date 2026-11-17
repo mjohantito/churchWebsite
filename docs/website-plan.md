@@ -10,7 +10,7 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 - Wednesday Night Prayer: 18.15 WIB
 - Scripture: Roma 15:7 (text to be pasted from the church's preferred translation)
 - Domain: none for now (not needed yet)
-- All service times live in ONE data file in the code, and every page reads from it.
+- Service times are managed in the admin (/admin/services) and every page reads them from the database; src/data/churchInfo.ts keeps only an offline fallback copy.
 
 ## Decisions so far
 
@@ -82,7 +82,7 @@ Admin page: staff login, then manage sermons, daily bread, announcements, roster
 ## Build order
 
 1. Homepage only (frontend, mock data, form UI with stub submit) — DONE, with a revision pass for reference layout, typography and times
-2. Other pages (frontend, mock data, stub forms): partly done. Daily Bread, Pengumuman and Jadwal Petugas Ibadah were built with step 3 on real data. Church Services, Baptisan and Contact Us are still "Coming soon" stubs.
+2. Other pages (frontend, mock data, stub forms): partly done. Daily Bread, Pengumuman, Jadwal Petugas Ibadah and Church Services are built on real data (Church Services is managed in /admin/services). Baptisan and Contact Us are still "Coming soon" stubs.
 3. Supabase: tables, form submissions, staff auth — DONE (see docs/backend-plan.md)
 4. Admin page — DONE (/admin, roles admin + editor; see docs/backend-plan.md)
 5. Email notification, deploy

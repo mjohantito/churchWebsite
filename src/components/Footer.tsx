@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { NAV } from '../config/site';
 import { CHURCH_INFO, MAPS_URL } from '../data/churchInfo';
 import { useLocalized } from '../lib/useLocalized';
+import { useServiceList } from '../data/queries';
 import { Icon } from './Icon';
 import { LanguageToggle } from './LanguageToggle';
 
 export function Footer() {
   const { t } = useTranslation();
-  const { times } = useLocalized();
+  const { times, pick } = useLocalized();
+  // Never blank: the offline copy in churchInfo.ts shows while loading or if the request fails.
+  const { services } = useServiceList();
   const year = new Date().getFullYear();
 
   return (
@@ -38,14 +41,12 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h2 className="footer-heading">{t('footer.times')}</h2>
             <dl className="mt-4 space-y-4 text-paper/85">
-              <div>
-                <dt className="font-medium text-paper">{t('footer.sunday')}</dt>
-                <dd>{times(CHURCH_INFO.services.sunday)}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-paper">{t('footer.prayer')}</dt>
-                <dd>{times(CHURCH_INFO.services.wednesdayPrayer)}</dd>
-              </div>
+              {services.filter((s) => s.times.length > 0).map((s) => (
+                <div key={s.id}>
+                  <dt className="font-medium text-paper">{pick(s.name)}</dt>
+                  <dd>{times(s.times)}</dd>
+                </div>
+              ))}
             </dl>
           </div>
 

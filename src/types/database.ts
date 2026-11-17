@@ -64,6 +64,110 @@ export type Database = {
           },
         ]
       }
+      church_service_times: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          id: string
+          label_en: string | null
+          label_id: string | null
+          service_id: string
+          sort_order: number
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          id?: string
+          label_en?: string | null
+          label_id?: string | null
+          service_id: string
+          sort_order?: number
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          id?: string
+          label_en?: string | null
+          label_id?: string | null
+          service_id?: string
+          sort_order?: number
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_service_times_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "church_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_services: {
+        Row: {
+          created_at: string
+          cta_label_en: string | null
+          cta_label_id: string | null
+          cta_type: Database["public"]["Enums"]["service_cta"]
+          cta_url: string | null
+          description_en: string | null
+          description_id: string | null
+          id: string
+          is_fixed: boolean
+          kind: Database["public"]["Enums"]["service_kind"]
+          name_en: string | null
+          name_id: string
+          show_on_homepage: boolean
+          sort_order: number
+          updated_at: string
+          visible: boolean
+          weekly_kind: Database["public"]["Enums"]["weekly_kind"] | null
+        }
+        Insert: {
+          created_at?: string
+          cta_label_en?: string | null
+          cta_label_id?: string | null
+          cta_type?: Database["public"]["Enums"]["service_cta"]
+          cta_url?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          is_fixed?: boolean
+          kind?: Database["public"]["Enums"]["service_kind"]
+          name_en?: string | null
+          name_id: string
+          show_on_homepage?: boolean
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
+          weekly_kind?: Database["public"]["Enums"]["weekly_kind"] | null
+        }
+        Update: {
+          created_at?: string
+          cta_label_en?: string | null
+          cta_label_id?: string | null
+          cta_type?: Database["public"]["Enums"]["service_cta"]
+          cta_url?: string | null
+          description_en?: string | null
+          description_id?: string | null
+          id?: string
+          is_fixed?: boolean
+          kind?: Database["public"]["Enums"]["service_kind"]
+          name_en?: string | null
+          name_id?: string
+          show_on_homepage?: boolean
+          sort_order?: number
+          updated_at?: string
+          visible?: boolean
+          weekly_kind?: Database["public"]["Enums"]["weekly_kind"] | null
+        }
+        Relationships: []
+      }
       daily_bread: {
         Row: {
           audio_path: string | null
@@ -374,12 +478,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      save_church_service: {
+        Args: { p_id: string; p_service: Json; p_times: Json }
+        Returns: string
+      }
     }
     Enums: {
       content_status: "draft" | "published"
       duty_service: "sun_am" | "sun_pm" | "wed"
       form_type: "new_member" | "prayer" | "choir" | "baptism" | "contact"
+      service_cta: "none" | "form_choir" | "link"
+      service_kind: "sunday" | "other"
       staff_role: "admin" | "editor"
       submission_status: "new" | "contacted" | "done"
       weekly_kind: "sunday_material" | "prayer_list"
@@ -513,6 +622,8 @@ export const Constants = {
       content_status: ["draft", "published"],
       duty_service: ["sun_am", "sun_pm", "wed"],
       form_type: ["new_member", "prayer", "choir", "baptism", "contact"],
+      service_cta: ["none", "form_choir", "link"],
+      service_kind: ["sunday", "other"],
       staff_role: ["admin", "editor"],
       submission_status: ["new", "contacted", "done"],
       weekly_kind: ["sunday_material", "prayer_list"],

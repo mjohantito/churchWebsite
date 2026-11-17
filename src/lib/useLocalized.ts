@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Localized } from '../data/types';
 import { isLang } from '../i18n';
-import { formatTime, formatTimes } from '../data/churchInfo';
+import { formatServiceTime, formatTime, formatTimes } from '../data/churchInfo';
 
 /** Picks the current language from bilingual { id, en } values; English falls back to Indonesian. */
 export function useLocalized() {
@@ -21,7 +21,8 @@ export function useLocalized() {
     [lang],
   );
   const time = useCallback((t: string) => formatTime(t, lang), [lang]);
-  const times = useCallback((list: readonly string[]) => formatTimes(list, lang), [lang]);
-  return { lang, pick, formatDate, time, times };
+  const times = useCallback((list: readonly { day: number; time: string }[]) => formatTimes(list, lang), [lang]);
+  const serviceTime = useCallback((t: { day: number; time: string }) => formatServiceTime(t, lang), [lang]);
+  return { lang, pick, formatDate, time, times, serviceTime };
 }
 

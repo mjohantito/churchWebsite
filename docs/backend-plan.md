@@ -40,6 +40,8 @@ RLS is enabled on every table. The helpers `private.is_staff()` and `private.is_
 | announcements, daily_bread, sermons, weekly_items | read `published` | read `published` | read all, insert, update (incl. publish) | + delete |
 | duty_assignments | read | read | read, insert, update | + delete |
 | groups, duty_roles | read `active` | read `active` | read all | insert, update, delete |
+| church_services | read `visible` | read `visible` | read all, insert, update | + delete (never the fixed Sunday row) |
+| church_service_times | read times of visible services | same | read all, insert, update, delete | same |
 | form_submissions | **insert only** | insert only | read; update `status` + `staff_notes` only | + delete |
 | staff_users | none | own row | own row | everyone; insert, update, delete |
 | storage (3 buckets) | files by public URL; no listing | none | upload, replace | + delete |
@@ -55,6 +57,50 @@ Other rules:
 Checks:
 - `npm run db:check`: as an anonymous visitor (add `-- --insert` to also prove a normal submission works).
 - `node --env-file=<file> scripts/check-roles.mjs`: signs in as an editor and an admin (`TEST_EDITOR_*` / `TEST_ADMIN_*` env vars) and calls the API directly to prove the role rules.
+
+## Church services (migration 20261118090000)
+
+Managed at `/admin/services`. They feed:
+- the homepage worship and fellowship carousel
+- the Church Services page
+- the footer schedule
+- the hero tag
+- the mobile menu
+- the admin roster's column labels
+
+`src/data/churchInfo.ts` keeps an offline copy (`FALLBACK_SERVICES`), shown only while the data loads or if the request fails.
+
+| Table | Columns |
+|---|---|
+| `church_services` | `kind` (`sunday` / `other`), `name_*`, `description_*`, `is_fixed`, `show_on_homepage`, `visible`, `sort_order`, `weekly_kind` (null / `sunday_material` / `prayer_list`: shows that weekly block on the card), `cta_type` (`none` / `form_choir` / `link`), `cta_label_*`, `cta_url` |
+| `church_service_times` | `service_id`, `day_of_week` (0 = Sunday … 6 = Saturday), `start_time` (`time`, read as WIB), `label_*` (e.g. "Ibadah pagi"), `sort_order`; unique (`service_id`, `day_of_week`, `start_time`) |
+
+Constraints:
+- A unique partial index allows only one `kind = 'sunday'` row.
+- `is_fixed` implies `kind = 'sunday'`.
+- `cta_type = 'link'` requires a `cta_url` starting with `https://`, `http://`, `/`, `mailto:` or `tel:`.
+
+**Saving:** `public.save_church_service(p_id, p_service jsonb, p_times jsonb)` creates or updates a service and replaces all its times in **one transaction**.
+- It is `SECURITY INVOKER`, so RLS and the triggers apply exactly as for direct table calls.
+- Only `authenticated` may execute it.
+- It can only create `kind = 'other'` services.
+
+**Sunday protection** applies to everyone, including admins and direct API calls:
+- `private.protect_fixed_service` (BEFORE INSERT/UPDATE/DELETE on `church_services`) rejects:
+  - deleting the fixed row
+  - creating a fixed row while signed in
+  - changing `is_fixed` on any row
+  - changing the fixed row's `kind`, `name_*` or `description_*`
+
+  Its times and display settings (visible, homepage, order, weekly block, button) can change.
+- `private.protect_service_time` (BEFORE UPDATE on `church_service_times`) rejects moving a time to another service.
+- `private.fixed_service_keeps_a_time` is a deferred constraint trigger (AFTER DELETE, `DEFERRABLE INITIALLY DEFERRED`). At commit it rejects any transaction that leaves the fixed service with no times. Replacing all times in one save works; removing the last time fails and is rolled back.
+
+**Roles:** editors may insert, update and delete *time rows* (removing a time is part of editing a service). Deleting a whole service is admin-only (RLS), and the Sunday row can never be deleted (trigger).
+
+**Freshness:** the public site reads services through TanStack Query (`['services']`, 60 s stale time). Every pre-rendered page also carries the build-time copy for its footer, which is marked stale and refetched on load. Saving in the admin invalidates the admin and public queries, so changes show on the public site after a refresh.
+
+**Tests:** `npm run db:services` (needs `.env.test-accounts` with `TEST_ADMIN_*` / `TEST_EDITOR_*`). It covers anonymous, editor and admin access, every Sunday rule, hiding, and deleting, all through direct API calls.
 
 ## Storage
 
@@ -121,6 +167,9 @@ Files:
 - `supabase/migrations/20261117100000_core_schema.sql`: enums, tables, constraints, triggers
 - `supabase/migrations/20261117100100_rls.sql`: helper functions, grants, policies
 - `supabase/migrations/20261117100200_storage.sql`: buckets and storage policies
+- `supabase/migrations/20261117100300_harden_policies.sql`: helpers moved to the `private` schema, one SELECT policy per role
+- `supabase/migrations/20261117120000_roles.sql`: editor/admin rules, inbox column privileges, `handled_by` trigger, 15 MB audio
+- `supabase/migrations/20261118090000_church_services.sql`: church services, times, Sunday-protection triggers, `save_church_service`, seed
 - `supabase/seed.sql`: the homepage mock content plus sample daily bread, announcements and roster. Dates are relative to today, all text is marked "Contoh / Sample", and a few `draft` rows exist so the RLS check has something to hide. Safe to re-run.
 
 Commands (Supabase CLI, project already linked):

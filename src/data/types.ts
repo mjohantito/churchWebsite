@@ -68,3 +68,23 @@ export interface StaffProfile {
   full_name: string;
   role: 'admin' | 'editor';
 }
+
+export interface ServiceTimeView {
+  /** 0 = Sunday … 6 = Saturday */
+  day: number;
+  /** "HH:MM", WIB */
+  time: string;
+  label: Localized | null;
+}
+
+export interface ServiceView {
+  id: string;
+  kind: 'sunday' | 'other';
+  name: Localized;
+  description: Localized | null;
+  show_on_homepage: boolean;
+  weekly_kind: WeeklyKind | null;
+  cta: { type: 'none' | 'form_choir' | 'link'; label: Localized | null; url: string | null };
+  /** sorted by day, then time */
+  times: ServiceTimeView[];
+}

@@ -11,7 +11,8 @@
     "db:types": "supabase gen types typescript --remote --schema public > src/types/database.ts",
     "db:push": "supabase db push --remote",
     "db:check": "node scripts/check-rls.mjs",
-    "db:roles": "node --env-file=.env.test-accounts scripts/check-roles.mjs"
+    "db:roles": "node --env-file=.env.test-accounts scripts/check-roles.mjs",
+    "db:services": "node --env-file=.env.test-accounts scripts/check-services.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

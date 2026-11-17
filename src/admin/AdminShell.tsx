@@ -15,6 +15,7 @@ export const NAV_ITEMS: Item[] = [
   { to: '/admin/sermons', key: 'sermons', icon: 'play-circle-linear' },
   { to: '/admin/weekly', key: 'weekly', icon: 'calendar-linear' },
   { to: '/admin/announcements', key: 'announcements', icon: 'document-text-linear' },
+  { to: '/admin/services', key: 'services', icon: 'clock-circle-linear' },
   { to: '/admin/roster', key: 'roster', icon: 'users-group-rounded-linear' },
   { to: '/admin/groups', key: 'groups', icon: 'map-point-linear', adminOnly: true },
   { to: '/admin/staff', key: 'staff', icon: 'user-plus-rounded-linear', adminOnly: true },
