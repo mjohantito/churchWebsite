@@ -56,3 +56,16 @@ export function Markdown({ text, className = '' }: { text: string; className?: s
     </div>
   );
 }
+
+/** Plain-text excerpt of formatted text (formatting marks removed), cut at a word. */
+export function excerpt(text: string, max = 180): string {
+  const plain = text
+    .replace(/\[([^\]\n]+)\]\([^)\s]+\)/g, '$1')
+    .replace(/\*\*([^*\n]+?)\*\*/g, '$1')
+    .replace(/(^|\W)[*_]([^*_\n]+?)[*_](?=\W|$)/g, '$1$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (plain.length <= max) return plain;
+  const cut = plain.slice(0, max);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(' '), max * 0.6)).replace(/[,.;:!?-]+$/, '')}…`;
+}

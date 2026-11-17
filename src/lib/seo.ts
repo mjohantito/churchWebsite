@@ -39,6 +39,9 @@ export function routeMeta(pathname: string, t: TFunction, formatDate?: (iso: str
       noindex: false,
     };
   }
+  if (/^\/pengumuman\/[^/]+$/.test(path)) {
+    return { title: t('meta.pageTitle', { page: t('nav.announcements') }), description: t('meta.descriptions.announcements'), noindex: false };
+  }
   const page = PAGES[path];
   if (page) {
     return { title: t('meta.pageTitle', { page: t(page.nav as 'nav.dailyBread') }), description: t(`meta.descriptions.${page.desc}`), noindex: false };

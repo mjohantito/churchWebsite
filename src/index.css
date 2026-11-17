@@ -41,7 +41,7 @@
   --gray-100: #f1eee9;
   --gray-200: #e4e0d9;
   --gray-300: #cbc5bc;
-  --gray-500: #79726a; /* 4.6:1 on paper: small text OK */
+  --gray-500: #6f6860; /* 5.18 paper, 4.74 band, 4.55 tint: small text OK */
   --gray-600: #5e5852;
   --gray-700: #3d3935;
 
@@ -59,14 +59,28 @@
   --font-label-stretch: 112%;
   --font-label-tracking: 0.06em;
 
-  /* BRAND ACCENT: swap this one value when the church picks a color. */
-  --accent: #8a8079;
+  /* ---------------------------------------------------------------
+     BRAND ACCENT: change --accent (and --on-accent) here; the rest derive.
+     Olive sage #5C6B4A. Contrast on paper #FAF8F5 (WCAG 2.x):
+       --accent         5.42:1 on paper, 4.75 on tint, 4.96 on band
+       --accent-strong  7.46:1 on paper, 6.55 on tint, 6.83 on band (small text)
+       --on-accent      white = 5.74:1 on --accent (ink would be 3.26, fails AA)
+     Use sparingly: labels, tags, active chips, audio controls, link
+     underlines, focus rings, script words. Never headlines, buttons or
+     large backgrounds.
+     --------------------------------------------------------------- */
+  --accent: #5c6b4a;
+  --on-accent: #ffffff;
+  --accent-strong: color-mix(in srgb, var(--accent) 75%, var(--ink)); /* #4A553C */
+  --accent-tint: color-mix(in srgb, var(--accent) 10%, var(--paper)); /* #EAEAE4 */
   /* Accent variant for use on the ink footer (keep it light enough to read). */
-  --accent-on-ink: color-mix(in srgb, var(--accent) 45%, var(--paper));
+  --accent-on-ink: color-mix(in srgb, var(--accent) 35%, var(--paper));
+  /* Archive bands: slightly darker paper */
+  --band: var(--gray-100);
 
   --radius-card: 1.75rem;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --focus: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink);
+  --focus: 0 0 0 3px var(--paper), 0 0 0 5px var(--accent-strong);
   /* distance from viewport edge to the page column (matches .page-x + max-w-page) */
   --gutter: max(1rem, calc((100vw - 84rem) / 2 + 1rem));
 
@@ -200,7 +214,7 @@ html.lenis body {
     text-transform: none;
     letter-spacing: 0;
     line-height: 1;
-    color: var(--ink);
+    color: var(--accent-strong);
     font-size: 1.3em;
     transform: rotate(-4deg);
     transform-origin: left center;
@@ -209,7 +223,7 @@ html.lenis body {
     overflow-wrap: normal;
   }
   .script-word--accent {
-    color: var(--accent);
+    color: var(--accent-strong);
   }
 
   /* Script word first, caps stacked beside it ("Ada | TEMPAT / UNTUKMU") */
@@ -296,7 +310,7 @@ html.lenis body {
     letter-spacing: 0;
     line-height: 1;
     white-space: nowrap;
-    color: var(--ink);
+    color: var(--accent-strong);
     transform: rotate(-4deg);
     transform-origin: left bottom;
     font-size: min(
@@ -440,7 +454,7 @@ html.lenis body {
   .nav-link:hover,
   .nav-link[aria-current='page'] {
     color: var(--ink);
-    text-decoration-color: currentColor;
+    text-decoration-color: var(--accent);
   }
   .menu-link {
     display: flex;
@@ -566,12 +580,14 @@ html.lenis body {
     min-height: 44px;
     font-weight: 500;
     text-decoration: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 6px;
-    transition: gap 0.3s var(--ease-out);
+    transition: gap 0.3s var(--ease-out), color 0.2s;
   }
   .text-link:hover {
     gap: 0.8rem;
+    color: var(--accent-strong);
   }
 
   .icon-button {
@@ -1029,29 +1045,7 @@ html.lenis body {
     }
   }
 
-  .audio-panel {
-    max-width: 38rem;
-    padding: 1.1rem 1.25rem;
-    border: 1px solid var(--gray-200);
-    border-radius: 0.85rem;
-    background: var(--surface);
-  }
 
-  .archive-link {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    min-height: 44px;
-    padding: 0.85rem 0;
-    transition: color 0.2s;
-  }
-  .archive-link:hover {
-    color: var(--gray-600);
-  }
-  .archive-link[aria-current='page'] {
-    padding-left: 0.85rem;
-    border-left: 2px solid var(--ink);
-  }
 
   .filter-chip {
     display: inline-flex;
@@ -1064,12 +1058,12 @@ html.lenis body {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
   .filter-chip:hover {
-    border-color: var(--ink);
+    border-color: var(--accent);
   }
   .filter-chip[aria-current='page'] {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--paper);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
   }
 
   .table-scroll {
@@ -1129,11 +1123,323 @@ html.lenis body {
 @layer components {
   .prose-link {
     text-decoration: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 4px;
   }
   .prose-link:hover {
+    color: var(--accent-strong);
     text-decoration-thickness: 2px;
   }
 }
 
+
+/* ================================================================== */
+/* Featured item + archive band (Daily Bread, Pengumuman)             */
+/* Accent only on: label, tags, audio controls, active row marker.    */
+/* ================================================================== */
+@layer components {
+  .featured-card {
+    padding: 1.5rem 1.25rem 1.75rem;
+    border: 1px solid var(--accent);
+    border-radius: 1.25rem;
+    background: var(--accent-tint);
+  }
+  @media (min-width: 640px) {
+    .featured-card {
+      padding: 2.25rem 2.5rem 2.5rem;
+    }
+  }
+  .featured-card__eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .featured-card__date {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray-700);
+  }
+  .featured-card__title {
+    margin-top: 0.9rem;
+    font-size: clamp(1.75rem, 5.5vw, 2.6rem);
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+  .featured-card__title-link {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+    transition: text-decoration-color 0.2s;
+  }
+  .featured-card__title-link:hover {
+    text-decoration-color: var(--accent);
+  }
+  .featured-card__meta {
+    margin-top: 0.75rem;
+    color: var(--gray-700);
+  }
+  .featured-card__media {
+    margin-top: 1.5rem;
+  }
+  .featured-card__image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0.85rem;
+  }
+  .featured-card__body {
+    margin-top: 1.75rem;
+    max-width: 40rem;
+  }
+  .featured-card__footer {
+    margin-top: 1.25rem;
+  }
+
+  .accent-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+  .accent-label__dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+
+  .tag--accent {
+    background: var(--paper);
+    border: 1px solid var(--accent);
+    color: var(--accent-strong);
+  }
+  .tag--sm {
+    min-height: 1.5rem;
+    padding: 0 0.55rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+  }
+
+  /* Full-width band below the main content */
+  .archive-band {
+    margin-top: 3.5rem; /* ≥ 48px on mobile */
+    padding: 2.5rem 0 3rem;
+    background: var(--band);
+    border-top: 1px solid var(--gray-300);
+  }
+  @media (min-width: 640px) {
+    .archive-band {
+      margin-top: 5rem;
+      padding: 3.5rem 0 4rem;
+    }
+  }
+  .archive-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    outline: none;
+  }
+  .archive-heading:focus-visible {
+    box-shadow: var(--focus);
+  }
+  .archive-mark {
+    width: 1.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .archive-list {
+    max-width: 52rem;
+    border-top: 1px solid var(--gray-300);
+  }
+  .archive-list > li {
+    border-bottom: 1px solid var(--gray-300);
+  }
+  .archive-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    min-height: 44px;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+  }
+  .archive-row:hover {
+    background: color-mix(in srgb, var(--paper) 60%, transparent);
+  }
+  .archive-row:hover .archive-row__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 4px;
+  }
+  .archive-row[aria-current='page'] {
+    background: var(--accent-tint);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .archive-row__main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+  .archive-row__title {
+    font-weight: 500;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .archive-row[aria-current='page'] .archive-row__title {
+    font-weight: 700;
+  }
+  .archive-row__excerpt {
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--gray-600);
+  }
+  .archive-row__arrow {
+    color: var(--gray-500);
+  }
+  .date-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 6.5rem;
+    min-height: 1.85rem;
+    padding: 0 0.6rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 999px;
+    background: var(--paper);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    white-space: nowrap;
+  }
+  @media (max-width: 479px) {
+    .archive-row {
+      grid-template-columns: 1fr auto;
+    }
+    .archive-row .date-chip {
+      grid-column: 1;
+      justify-self: start;
+      min-width: 0;
+    }
+    .archive-row__main {
+      grid-column: 1;
+    }
+    .archive-row__arrow {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+  }
+
+  /* Audio player: accent button + progress */
+  .audio-player {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    max-width: 36rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 1rem;
+    background: var(--paper);
+  }
+  @media (min-width: 480px) {
+    .audio-player {
+      border-radius: 999px;
+    }
+  }
+  .audio-player__btn {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    transition: background-color 0.2s;
+  }
+  .audio-player__btn:hover:not(:disabled) {
+    background: var(--accent-strong);
+  }
+  .audio-player__btn:disabled {
+    opacity: 0.5;
+  }
+  .audio-player__range {
+    flex: 1;
+    min-width: 8rem;
+    height: 44px;
+    background: transparent;
+    accent-color: var(--accent);
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .audio-player__range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--accent) var(--p, 0%), var(--gray-300) var(--p, 0%));
+  }
+  .audio-player__range::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--gray-300);
+  }
+  .audio-player__range::-moz-range-progress {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .audio-player__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background: var(--accent-strong);
+    border: 2px solid var(--paper);
+  }
+  .audio-player__range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--accent-strong);
+    border: 2px solid var(--paper);
+  }
+  .audio-player__range:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+    border-radius: 999px;
+  }
+  .audio-player__time {
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-700);
+  }
+  .audio-player__error {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+    color: #a3271b;
+  }
+}
+
+/* A page that ends with an archive band runs straight into the footer. */
+main:has(> .archive-band:last-child) + footer {
+  margin-top: 0;
+}

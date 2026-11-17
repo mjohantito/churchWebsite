@@ -216,6 +216,17 @@ const id = {
     invalidDate: 'Tanggal tidak valid.',
     backToToday: 'Kembali ke renungan hari ini',
     readingLabel: 'Bacaan',
+    seeArchive: 'Lihat arsip',
+    loadMore: 'Muat lebih banyak',
+    archiveCount: '{{shown}} dari {{total}} renungan',
+    entryOf: 'Renungan {{date}}',
+  },
+
+  audio: {
+    play: 'Putar audio',
+    pause: 'Jeda audio',
+    seek: 'Posisi audio',
+    position: '{{current}} dari {{total}}',
   },
 
   announcements: {
@@ -226,6 +237,14 @@ const id = {
     empty: 'Belum ada pengumuman.',
     emptyGroup: 'Belum ada pengumuman dari kelompok ini.',
     postedOn: 'Diterbitkan',
+    latest: 'Terbaru',
+    earlier: 'Pengumuman sebelumnya',
+    others: 'Pengumuman lainnya',
+    readMore: 'Baca selengkapnya',
+    readMoreAbout: 'Baca selengkapnya: {{title}}',
+    backToAll: 'Semua pengumuman',
+    notFound: 'Pengumuman ini tidak ditemukan atau sudah tidak ditampilkan.',
+    seeEarlier: 'Lihat pengumuman sebelumnya',
   },
 
   roster: {

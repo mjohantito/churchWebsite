@@ -83,6 +83,7 @@ function PublicSite() {
               <Route path="/daily-bread" element={<DailyBreadPage />} />
               <Route path="/daily-bread/:date" element={<DailyBreadPage />} />
               <Route path="/pengumuman" element={<AnnouncementsPage />} />
+              <Route path="/pengumuman/:id" element={<AnnouncementsPage />} />
               <Route path="/jadwal-petugas" element={<RosterPage />} />
               {/* Staff only. Not linked from the public navigation. */}
               <Route path="/login" element={<LoginPage />} />

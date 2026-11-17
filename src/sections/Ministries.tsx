@@ -54,7 +54,7 @@ export function Ministries() {
                   <Media id={group} className="rounded-[1.5rem]" sizes="(min-width: 1024px) 34vw, (min-width: 640px) 52vw, 92vw" />
                 </div>
                 <div className="sm:col-span-4" data-reveal>
-                  <h3 className="font-script text-[2.6rem] leading-[1.1] text-ink sm:text-5xl">
+                  <h3 className="font-script text-[2.6rem] leading-[1.1] text-accent-strong sm:text-5xl">
                     {t(`ministries.groups.${group}.script`)}
                   </h3>
                   <p className="mt-3 max-w-[24rem] leading-relaxed text-stone-700">

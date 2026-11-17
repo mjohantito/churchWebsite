@@ -8,6 +8,10 @@ export default {
         paper: 'var(--paper)',
         surface: 'var(--surface)',
         accent: 'var(--accent)',
+        'accent-strong': 'var(--accent-strong)',
+        'accent-tint': 'var(--accent-tint)',
+        'on-accent': 'var(--on-accent)',
+        band: 'var(--band)',
         stone: {
           100: 'var(--gray-100)',
           200: 'var(--gray-200)',

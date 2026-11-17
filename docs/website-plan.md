@@ -24,7 +24,8 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 - Homepage section 4 groups: Kids, Students, Youth, Young Adults, Adults
 - Mood: warm modern editorial + calm and reverent
 - Media: placeholders for now (photos, logo, YouTube sermon, daily bread audio). Real slides and summary text will be supplied for sermons.
-- Brand: black and white monochrome for now, accent color decided later
+- Brand: black and white monochrome plus ONE accent, olive sage #5C6B4A (decided 2026-11-17). Defined once in src/index.css (`--accent`); `--accent-tint`, `--accent-strong` and `--on-accent` derive from it. Contrast on paper: accent 5.42:1, accent-strong 7.46:1, white on accent 5.74:1. Used sparingly, only for: the "Hari ini / Today" label, audio controls, active filter chips, announcement group tags, link underlines and hover, focus rings, and script accent words (accent-strong). Headlines, buttons and large backgrounds stay monochrome; no section is tinted.
+- Page pattern for content with history (Daily Bread, Pengumuman): one featured card (accent tint + 1px accent border) for the current item, and the archive below in its own full-width band (slightly darker paper). Shared components: FeaturedCard, ArchiveSection.
 - Typography rule: ONE display typeface (the heavy uppercase face used in the hero headline) is used for the hero headline, the "SETIA BAKTI" wordmark, section display headings such as "COME AND WORSHIP", and every page title. Script face only for accent words.
 
 ## Reference traits (user's reference site, high-level only, not to be copied)
@@ -86,7 +87,7 @@ Admin page: staff login, then manage sermons, daily bread, announcements, roster
 4. Admin page — DONE (/admin, roles admin + editor; see docs/backend-plan.md)
 5. Email notification, deploy
    - 5a. Deploy preparation (Vercel config, security headers, SEO, robots/sitemap, env checks) — DONE (see docs/deploy.md)
-   - 5b. Staff email notifications for new form submissions — NEXT
+   - 5b. Staff email notifications for new form submissions — POSTPONED until we have a domain (needed for a verified sending address)
    - 5c. First production deploy and custom domain
 
 ## Open items

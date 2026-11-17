@@ -212,6 +212,17 @@ const en: Shape<Dictionary> = {
     invalidDate: 'That date is not valid.',
     backToToday: 'Back to today’s devotional',
     readingLabel: 'Reading',
+    seeArchive: 'See archive',
+    loadMore: 'Load more',
+    archiveCount: '{{shown}} of {{total}} devotionals',
+    entryOf: 'Devotional for {{date}}',
+  },
+
+  audio: {
+    play: 'Play audio',
+    pause: 'Pause audio',
+    seek: 'Audio position',
+    position: '{{current}} of {{total}}',
   },
 
   announcements: {
@@ -222,6 +233,14 @@ const en: Shape<Dictionary> = {
     empty: 'No announcements yet.',
     emptyGroup: 'No announcements from this group yet.',
     postedOn: 'Posted',
+    latest: 'Latest',
+    earlier: 'Earlier announcements',
+    others: 'More announcements',
+    readMore: 'Read more',
+    readMoreAbout: 'Read more: {{title}}',
+    backToAll: 'All announcements',
+    notFound: 'This announcement was not found or is no longer shown.',
+    seeEarlier: 'See earlier announcements',
   },
 
   roster: {
