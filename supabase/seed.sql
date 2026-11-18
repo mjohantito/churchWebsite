@@ -99,6 +99,13 @@ insert into public.announcements (id, group_id, title_id, title_en, body_id, bod
    'Draf untuk menguji keamanan.', null, null, 'draft', null)
 on conflict (id) do nothing;
 
+-- Each sample in the Sunday-to-Saturday week (Asia/Jakarta) of its publish date.
+update public.announcements
+set week_start = (coalesce(published_at, created_at) at time zone 'Asia/Jakarta')::date
+               - extract(dow from (coalesce(published_at, created_at) at time zone 'Asia/Jakarta')::date)::int
+where id in ('00000000-0000-4000-8000-000000000501', '00000000-0000-4000-8000-000000000502',
+             '00000000-0000-4000-8000-000000000503', '00000000-0000-4000-8000-000000000504');
+
 -- ------------------------------------------------------------------
 -- Duty roster: roles + this week and next week (placeholder names)
 -- ------------------------------------------------------------------

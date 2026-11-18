@@ -19,13 +19,14 @@ i18n.addResourceBundle('en', 'translation', { admin: adminEn }, true, true);
 import Dashboard from './screens/Dashboard';
 import Inbox from './screens/Inbox';
 import './admin.css';
-import { AnnouncementList, DailyBreadList, SermonList, WeeklyList } from './screens/Lists';
+import { DailyBreadList, SermonList, WeeklyList } from './screens/Lists';
 
 const InboxDetail = lazy(() => import('./screens/InboxDetail'));
 const DailyBreadEdit = lazy(() => import('./screens/DailyBreadEdit'));
 const SermonEdit = lazy(() => import('./screens/SermonEdit'));
 const WeeklyEdit = lazy(() => import('./screens/WeeklyEdit'));
 const AnnouncementEdit = lazy(() => import('./screens/AnnouncementEdit'));
+const Announcements = lazy(() => import('./screens/Announcements'));
 const Roster = lazy(() => import('./screens/Roster'));
 const Services = lazy(() => import('./screens/Services'));
 const ServiceEdit = lazy(() => import('./screens/ServiceEdit'));
@@ -57,7 +58,7 @@ export default function AdminApp() {
               <Route path="/admin/sermons/:id" element={<SermonEdit />} />
               <Route path="/admin/weekly" element={<WeeklyList />} />
               <Route path="/admin/weekly/:id" element={<WeeklyEdit />} />
-              <Route path="/admin/announcements" element={<AnnouncementList />} />
+              <Route path="/admin/announcements" element={<Announcements />} />
               <Route path="/admin/announcements/:id" element={<AnnouncementEdit />} />
               <Route path="/admin/services" element={<Services />} />
               <Route path="/admin/services/:id" element={<ServiceEdit />} />

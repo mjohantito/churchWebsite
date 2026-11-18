@@ -66,3 +66,22 @@ export async function listDailyBread(limit = 60): Promise<DailyBreadSummary[]> {
   if (error) fail('listDailyBread', error);
   return (data ?? []).map((r) => ({ entry_date: r.entry_date, title: loc(r.title_id, r.title_en) }));
 }
+
+/**
+ * Calendar: only the dates of published entries up to today (Asia/Jakarta),
+ * newest first. A small list of strings; no titles or bodies.
+ * PostgREST caps a response at 1000 rows (~2.7 years of daily entries).
+ */
+export async function listDailyBreadDates(): Promise<string[]> {
+  const today = jakartaToday();
+  if (USE_MOCK) return mockDailyBread().map((d) => d.entry_date).filter((d) => d <= today);
+  const { data, error } = await getSupabase()
+    .from('daily_bread')
+    .select('entry_date')
+    .eq('status', 'published')
+    .lte('entry_date', today)
+    .order('entry_date', { ascending: false })
+    .limit(1000);
+  if (error) fail('listDailyBreadDates', error);
+  return (data ?? []).map((r) => r.entry_date);
+}

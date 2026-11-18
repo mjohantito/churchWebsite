@@ -21,7 +21,7 @@ Dynamic text is Indonesian-first: `*_id` is required and `*_en` is optional. The
 |---|---|---|
 | `staff_users` | Who may use the admin page | `user_id` → `auth.users`, `full_name`, `role` (`admin` / `editor`) |
 | `groups` | Who posts announcements | `slug` (unique), `name`, `sort_order`, `active` |
-| `announcements` | Pengumuman | `group_id`, `title_*`, `body_*`, `image_path`, `status`, `published_at` (auto-set when published) |
+| `announcements` | Pengumuman | `group_id`, `title_*`, `body_*`, `image_path`, `status`, `published_at` (auto-set when published), `week_start` (Sunday that starts its week), `sort_order` |
 | `daily_bread` | One devotional per day | `entry_date` (unique), `title_*`, `scripture_ref`, `body_*`, `audio_path`, `status` |
 | `sermons` | Sermons | `title_*`, `preacher`, `preached_on`, `scripture_ref`, `youtube_id` (11 chars), `summary_*`, `slides_path`, `status` |
 | `weekly_items` | Homepage "Next Sunday's material" / "Next prayer list" | `kind`, `service_date`, `title_*`, `body_*` (one line per item), `file_path`, `status`; unique (`kind`, `service_date`) |
@@ -124,6 +124,44 @@ Files are served by public URL. The `*_path` columns store the path inside the b
 
   The database enforces the same rules through RLS.
 
+## Announcements by week (migrations 20261118120000, 20261118130000, 20261118140000)
+
+Every announcement belongs to one Sunday-to-Saturday week (Asia/Jakarta). The public page shows one week at a time; staff order items inside a week.
+
+**Columns:**
+- `week_start date not null`: the Sunday that starts its week. A CHECK (`announcements_week_start_is_sunday`, `extract(dow from week_start) = 0`) rejects any other day. The default is the current Jakarta week's Sunday.
+  - Weeks were first Monday-based (20261118120000) and switched to Sunday in 20261118140000. That migration backfilled `week_start` = Jakarta publish date (`created_at` for drafts) minus its day of week, then renumbered `sort_order`.
+  - The frontend uses the shared helper `src/lib/week.ts` (`getWeekStart`, `formatWeekRange`, `addWeeks`); a picked date becomes the Sunday on or before it.
+- `sort_order int not null default 0`: display order within the week.
+- Index `announcements_week_idx` on (`week_start`, `status`).
+
+**Order:** `sort_order`, then `created_at`, then `id`. The trigger `private.announcement_append_sort` (BEFORE INSERT / UPDATE OF week_start) puts a new item (sort_order 0), or one moved to another week, after the last item of that week.
+
+**Functions** (all SECURITY INVOKER with an empty `search_path`, so RLS still decides who may read or write):
+- `announcement_weeks()`: the distinct weeks with published announcements, for the public navigator bounds. Callable by anon and authenticated. Draft-only weeks never appear.
+- `reorder_announcements(p_week, p_ids)`: sets `sort_order` 1..n in the given order. Ids outside the week are ignored. Authenticated only, so the "staff update" policy applies.
+- `copy_announcements_to_next_week(p_ids)`: copies to `week_start + 7` as drafts (`published_at` null), after the items already in that week, in their original order. Authenticated only, so the "staff insert" policy applies.
+
+**RLS:** unchanged. Visitors read `published` rows only, editors insert and update, admins also delete.
+
+**Images:** copies share the original's `image_path`. Deleting an announcement (admin) removes its image file only when no other row still uses that path (`deleteContent` in `src/data/admin/content.ts`).
+
+**Data layer:**
+- public: `listAnnouncementWeeks`, `listAnnouncementsForWeek(week)`, `getAnnouncement(id)` in `src/data/announcements.ts`; group filtering happens on the page.
+- admin: `listWeekAnnouncements`, `reorderAnnouncements`, `copyAnnouncementsToNextWeek` in `src/data/admin/announcements.ts`.
+
+**Tests:** `npm run db:announcements` (needs `.env.test-accounts`). It creates A–E this week and F–J next week, then checks:
+- each week shows only its own items
+- the Sunday CHECK (a Monday or a Saturday is rejected) and the default week
+- a draft-only week stays invisible to visitors
+- anon cannot write or call the staff functions
+- reorder
+- new and moved items go to the end
+- copy as drafts, keeping order
+- editor cannot delete; admin can
+
+Everything it creates is removed afterwards.
+
 ## Admin page (/admin)
 
 - **Separate chunk:** a code-split JS + CSS chunk, with its i18n text loaded alongside it. The public bundle does not include it. It uses its own calm shell: no Lenis, no scroll animations, `noindex`. The layout is a sidebar on wide screens and a drawer on phones.
@@ -133,7 +171,7 @@ Files are served by public URL. The `*_path` columns store the path inside the b
   - Daily Bread
   - Sermons (YouTube link parsed and previewed)
   - Weekly Items
-  - Announcements
+  - Announcements (week view: navigator, up/down order, copy one or all to next week as drafts; the form picks the week)
   - Duty Roster (week grid, Save, copy from last week; admin: manage roles)
   - Groups (admin)
   - Staff (admin, read-only)
@@ -148,7 +186,7 @@ Files are served by public URL. The `*_path` columns store the path inside the b
 ## Frontend data layer
 
 - `src/lib/supabase.ts`: the one client. `src/types/database.ts`: generated types.
-- `src/data/*.ts`: one function per resource (`getLatestSermon`, `getNextWeeklyItem`, `getCurrentDailyBread`, `getDailyBreadByDate`, `listDailyBread`, `listGroups`, `listAnnouncements`, `getRoster`, `submitForm`, plus the auth helpers). Pages never import Supabase.
+- `src/data/*.ts`: one function per resource (`getLatestSermon`, `getNextWeeklyItem`, `getCurrentDailyBread`, `getDailyBreadByDate`, `listDailyBread`, `listGroups`, `listAnnouncementWeeks`, `listAnnouncementsForWeek`, `getAnnouncement`, `listDailyBreadDates`, `getRoster`, `submitForm`, plus the auth helpers). Pages never import Supabase.
 - `src/data/queries.ts`: TanStack Query hooks with loading, error (with retry) and empty states.
 - The build prerenders the homepage with real data (`scripts/prerender.mjs`), so it is complete without JavaScript. The browser refreshes it on load. If the database is unreachable at build time, the build still succeeds and the data loads in the browser.
 
@@ -170,6 +208,9 @@ Files:
 - `supabase/migrations/20261117100300_harden_policies.sql`: helpers moved to the `private` schema, one SELECT policy per role
 - `supabase/migrations/20261117120000_roles.sql`: editor/admin rules, inbox column privileges, `handled_by` trigger, 15 MB audio
 - `supabase/migrations/20261118090000_church_services.sql`: church services, times, Sunday-protection triggers, `save_church_service`, seed
+- `supabase/migrations/20261118120000_announcement_weeks.sql`: announcements `week_start` + `sort_order` (backfill, Monday CHECK, index), `announcement_weeks`, `reorder_announcements`, `copy_announcements_to_next_week`
+- `supabase/migrations/20261118130000_announcement_order.sql`: renumbers `sort_order` 1..n per week; trigger that appends new or moved announcements at the end of their week
+- `supabase/migrations/20261118140000_announcement_weeks_sunday.sql`: weeks start on Sunday: Sunday CHECK, backfill, renumbered order, new default
 - `supabase/seed.sql`: the homepage mock content plus sample daily bread, announcements and roster. Dates are relative to today, all text is marked "Contoh / Sample", and a few `draft` rows exist so the RLS check has something to hide. Safe to re-run.
 
 Commands (Supabase CLI, project already linked):

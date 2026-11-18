@@ -71,8 +71,11 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // New route: start at the top.
+  // New route: start at the top, unless the navigation asked to keep the
+  // position (navigate(to, { state: { keepScroll: true } }), e.g. the Daily
+  // Bread week calendar swapping the devotional below it).
   useEffect(() => {
+    if ((location.state as { keepScroll?: boolean } | null)?.keepScroll) return;
     if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);
     requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -96,7 +99,12 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       else window.scrollTo({ top: 0 });
     },
     scrollToElement(el) {
-      if (lenisRef.current) lenisRef.current.scrollTo(el, { offset: -88 });
+      if (lenisRef.current) {
+        // Content may have just grown (data loaded): re-measure, or Lenis
+        // stops at the old page height.
+        lenisRef.current.resize();
+        lenisRef.current.scrollTo(el, { offset: -88 });
+      }
       else el.scrollIntoView();
     },
   }), []);

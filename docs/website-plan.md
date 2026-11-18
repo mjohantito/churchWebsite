@@ -20,12 +20,22 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 - Forms: save submissions (including the person's phone number and email) in the database. Staff contact people manually. No WhatsApp integration. Staff get an email notification (staff email address TBD).
 - Duty roster: one weekly table
 - Daily bread: posted every day, audio + text
-- Announcements (Pengumuman): posted by many local groups (KPW and others, local group worship services), not every week, so filter by group and show newest first
+- Announcements (Pengumuman): posted by many local groups (KPW and others, local group worship services). Revised 2026-11-18:
+  - **One week at a time** (Sunday to Saturday, Asia/Jakarta), defaulting to the current week. A week navigator (arrows + "15–21 Nov 2026" + "Minggu ini / This week") steps only between weeks that have published announcements, plus the current week.
+  - **Next week:** announcements published for it are reachable as soon as they are published.
+  - **Empty current week:** a friendly message and a link to the latest week that has some.
+  - **Group filter:** chips filter within the selected week.
+  - **Items:** plain `<article>`s with no card: group tag (accent), title, markdown body clamped to about 6 lines with "Baca selengkapnya", optional image. They are separated by 1.5px `--border-strong` lines with 32px padding.
+  - **Order:** staff order within a week.
+  - **Links:** `/pengumuman/:id` stays for direct links, and each item has an anchor.
+  - **Admin:** week view with up/down order and "copy to next week" (one or all, as drafts); the form picks the week ("Minggu ini", "Minggu depan" or any date, stored as the Sunday on or before it).
 - Homepage section 4 groups: Kids, Students, Youth, Young Adults, Adults
 - Mood: warm modern editorial + calm and reverent
 - Media: placeholders for now (photos, logo, YouTube sermon, daily bread audio). Real slides and summary text will be supplied for sermons.
 - Brand: black and white monochrome plus ONE accent, olive sage #5C6B4A (decided 2026-11-17). Defined once in src/index.css (`--accent`); `--accent-tint`, `--accent-strong` and `--on-accent` derive from it. Contrast on paper: accent 5.42:1, accent-strong 7.46:1, white on accent 5.74:1. Used sparingly, only for: the "Hari ini / Today" label, audio controls, active filter chips, announcement group tags, link underlines and hover, focus rings, and script accent words (accent-strong). Headlines, buttons and large backgrounds stay monochrome; no section is tinted.
-- Page pattern for content with history (Daily Bread, Pengumuman): one featured card (accent tint + 1px accent border) for the current item, and the archive below in its own full-width band (slightly darker paper). Shared components: FeaturedCard, ArchiveSection.
+- Daily Bread page pattern: one featured card (accent tint + 1px accent border) for the chosen devotional (FeaturedCard).
+  - Daily Bread (revised 2026-11-18): from 1024px, two columns: the devotional on the left, the archive as a sticky side panel on the right (own scroll, open date highlighted, "Muat lebih banyak"). Below 1024px there is no archive: a week-strip calendar (WeekCalendar, Sunday to Saturday, swipe or arrow buttons) sits above the devotional; days with an entry have an accent dot; empty and future days are dimmed. It is bounded by the earliest entry's week and the current week (Asia/Jakarta), and fed by a dates-only query.
+- Weeks (decided 2026-11-18): the Daily Bread calendar and Pengumuman use SUNDAY-to-Saturday weeks in Asia/Jakarta, through one shared helper (src/lib/week.ts: getWeekStart, formatWeekRange, addWeeks; tests: `npm test`). The duty roster (Jadwal Petugas) keeps its Monday weeks.
 - Typography rule: ONE display typeface (the heavy uppercase face used in the hero headline) is used for the hero headline, the "SETIA BAKTI" wordmark, section display headings such as "COME AND WORSHIP", and every page title. Script face only for accent words.
 
 ## Reference traits (user's reference site, high-level only, not to be copied)

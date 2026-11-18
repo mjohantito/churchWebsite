@@ -2,8 +2,8 @@
 import { useQuery, type QueryClient } from '@tanstack/react-query';
 import { getLatestSermon } from './sermons';
 import { getNextWeeklyItem } from './weekly';
-import { getCurrentDailyBread, getDailyBreadByDate, listDailyBread } from './dailyBread';
-import { listAnnouncements, listGroups } from './announcements';
+import { getCurrentDailyBread, getDailyBreadByDate, listDailyBread, listDailyBreadDates } from './dailyBread';
+import { getAnnouncement, listAnnouncementWeeks, listAnnouncementsForWeek, listGroups } from './announcements';
 import { getRoster } from './roster';
 import { listServices } from './services';
 import { FALLBACK_SERVICES } from './churchInfo';
@@ -16,8 +16,11 @@ export const queryKeys = {
   dailyBreadCurrent: ['daily-bread', 'current'] as const,
   dailyBreadByDate: (date: string) => ['daily-bread', 'date', date] as const,
   dailyBreadArchive: ['daily-bread', 'archive'] as const,
+  dailyBreadDates: ['daily-bread', 'dates'] as const,
   groups: ['groups'] as const,
-  announcements: (group: string | null) => ['announcements', group ?? 'all'] as const,
+  announcementWeeks: ['announcements', 'weeks'] as const,
+  announcementsWeek: (week: string) => ['announcements', 'week', week] as const,
+  announcement: (id: string) => ['announcements', 'item', id] as const,
   roster: (weekStart: string) => ['roster', weekStart] as const,
   services: ['services'] as const,
 };
@@ -70,10 +73,21 @@ export const useDailyBreadByDate = (date: string, enabled = true) =>
 export const useDailyBreadArchive = () =>
   useQuery({ queryKey: queryKeys.dailyBreadArchive, queryFn: () => listDailyBread() });
 
+/** Published dates only (calendar dots and week bounds). */
+export const useDailyBreadDates = () =>
+  useQuery({ queryKey: queryKeys.dailyBreadDates, queryFn: listDailyBreadDates, staleTime: 5 * 60_000 });
+
 export const useGroups = () => useQuery({ queryKey: queryKeys.groups, queryFn: listGroups, staleTime: 10 * 60_000 });
 
-export const useAnnouncements = (group: string | null) =>
-  useQuery({ queryKey: queryKeys.announcements(group), queryFn: () => listAnnouncements(group) });
+/** Week-start Sundays that have published announcements (navigator bounds). */
+export const useAnnouncementWeeks = () =>
+  useQuery({ queryKey: queryKeys.announcementWeeks, queryFn: listAnnouncementWeeks });
+
+export const useAnnouncementsForWeek = (week: string) =>
+  useQuery({ queryKey: queryKeys.announcementsWeek(week), queryFn: () => listAnnouncementsForWeek(week) });
+
+export const useAnnouncement = (id: string) =>
+  useQuery({ queryKey: queryKeys.announcement(id), queryFn: () => getAnnouncement(id) });
 
 export const useRoster = (weekStart: string) =>
   useQuery({ queryKey: queryKeys.roster(weekStart), queryFn: () => getRoster(weekStart) });

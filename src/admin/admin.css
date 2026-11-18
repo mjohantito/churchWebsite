@@ -433,3 +433,23 @@
 }
 .time-pick { display: flex; gap: 0.35rem; align-items: center; }
 .time-pick select { min-width: 0; }
+
+/* Week shortcuts in the announcement form ("Minggu ini" / "Minggu depan") */
+.choice-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 1rem;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.choice-chip:hover { border-color: var(--ink); }
+.choice-chip.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.choice-chip:focus-visible { outline: none; box-shadow: var(--focus); }

@@ -1,6 +1,7 @@
 // MOCK DATA for offline work (VITE_USE_MOCK=true). Same content as
 // supabase/seed.sql. Dates are computed relative to today so cards stay current.
 import { addDays, jakartaToday, mondayOf } from '../lib/dates';
+import { addWeeks, getWeekStart } from '../lib/week';
 import type {
   AnnouncementView, DailyBreadView, GroupView, RosterView, SermonView, WeeklyItemView, DutyService,
 } from './types';
@@ -74,16 +75,17 @@ export const mockGroups: GroupView[] = [
 
 export function mockAnnouncements(): AnnouncementView[] {
   const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+  const thisWeek = getWeekStart(today());
   return [
     { id: 'a1', group: mockGroups[0], title: { id: 'Contoh pengumuman KPW', en: 'Sample KPW announcement' },
       body: { id: 'Ini contoh pengumuman dari KPW. Isi sebenarnya akan ditulis oleh staf melalui halaman admin.', en: 'This is a sample announcement from KPW. Staff will write the real content from the admin page.' },
-      image_url: null, published_at: daysAgo(1) },
+      image_url: null, published_at: daysAgo(1), week_start: thisWeek },
     { id: 'a2', group: mockGroups[1], title: { id: 'Contoh pengumuman Kelompok A', en: 'Sample announcement from Group A' },
       body: { id: 'Contoh isi pengumuman untuk menguji filter kelompok.', en: 'Sample text to test the group filter.' },
-      image_url: null, published_at: daysAgo(3) },
+      image_url: null, published_at: daysAgo(3), week_start: thisWeek },
     { id: 'a3', group: mockGroups[2], title: { id: 'Contoh pengumuman Kelompok B' },
       body: { id: 'Pengumuman ini sengaja tanpa versi bahasa Inggris, untuk menguji fallback ke bahasa Indonesia.' },
-      image_url: null, published_at: daysAgo(6) },
+      image_url: null, published_at: daysAgo(6), week_start: addWeeks(thisWeek, -1) },
   ];
 }
 

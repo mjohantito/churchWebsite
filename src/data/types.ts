@@ -55,6 +55,7 @@ export interface AnnouncementView {
   body: Localized;
   image_url: string | null;
   published_at: string; // ISO timestamp
+  week_start: string; // Sunday that starts its week, YYYY-MM-DD (Asia/Jakarta; src/lib/week.ts)
 }
 
 export interface RosterView {

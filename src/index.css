@@ -44,6 +44,7 @@
   --gray-500: #6f6860; /* 5.18 paper, 4.74 band, 4.55 tint: small text OK */
   --gray-600: #5e5852;
   --gray-700: #3d3935;
+  --border-strong: var(--gray-700); /* separators that must read clearly (announcement list) */
 
   /* DISPLAY TYPE: big display headings only (hero caps, wordmark, section
      and page titles). Used through the `font-display` utility (tailwind.config.js),
@@ -176,7 +177,8 @@ html.lenis body {
 
   /* Page titles (PageHeader): same display face, one step larger than sections. */
   .page-title {
-    font-size: clamp(2.6rem, 8.6vw, 5.4rem);
+    /* min 1.75rem: one-word titles such as "ANNOUNCEMENTS" fit a 320px phone */
+    font-size: clamp(1.75rem, 8.6vw, 5.4rem);
     max-width: 16em;
   }
 
@@ -1135,7 +1137,7 @@ html.lenis body {
 
 
 /* ================================================================== */
-/* Featured item + archive band (Daily Bread, Pengumuman)             */
+/* Featured item (Daily Bread)                                        */
 /* Accent only on: label, tags, audio controls, active row marker.    */
 /* ================================================================== */
 @layer components {
@@ -1229,19 +1231,7 @@ html.lenis body {
     letter-spacing: 0.12em;
   }
 
-  /* Full-width band below the main content */
-  .archive-band {
-    margin-top: 3.5rem; /* ≥ 48px on mobile */
-    padding: 2.5rem 0 3rem;
-    background: var(--band);
-    border-top: 1px solid var(--gray-300);
-  }
-  @media (min-width: 640px) {
-    .archive-band {
-      margin-top: 5rem;
-      padding: 3.5rem 0 4rem;
-    }
-  }
+  /* Section heading with a small accent mark (Daily Bread archive panel) */
   .archive-heading {
     display: flex;
     align-items: center;
@@ -1261,90 +1251,6 @@ html.lenis body {
     height: 3px;
     border-radius: 2px;
     background: var(--accent);
-  }
-  .archive-list {
-    max-width: 52rem;
-    border-top: 1px solid var(--gray-300);
-  }
-  .archive-list > li {
-    border-bottom: 1px solid var(--gray-300);
-  }
-  .archive-row {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.4rem 0.9rem;
-    min-height: 44px;
-    padding: 0.6rem 0.5rem;
-    font-size: 0.95rem;
-    transition: background-color 0.2s;
-  }
-  .archive-row:hover {
-    background: color-mix(in srgb, var(--paper) 60%, transparent);
-  }
-  .archive-row:hover .archive-row__title {
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
-    text-underline-offset: 4px;
-  }
-  .archive-row[aria-current='page'] {
-    background: var(--accent-tint);
-    box-shadow: inset 3px 0 0 var(--accent);
-  }
-  .archive-row__main {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    min-width: 0;
-  }
-  .archive-row__title {
-    font-weight: 500;
-    line-height: 1.3;
-    overflow-wrap: anywhere;
-  }
-  .archive-row[aria-current='page'] .archive-row__title {
-    font-weight: 700;
-  }
-  .archive-row__excerpt {
-    font-size: 0.875rem;
-    line-height: 1.45;
-    color: var(--gray-600);
-  }
-  .archive-row__arrow {
-    color: var(--gray-500);
-  }
-  .date-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 6.5rem;
-    min-height: 1.85rem;
-    padding: 0 0.6rem;
-    border: 1px solid var(--gray-300);
-    border-radius: 999px;
-    background: var(--paper);
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--gray-700);
-    white-space: nowrap;
-  }
-  @media (max-width: 479px) {
-    .archive-row {
-      grid-template-columns: 1fr auto;
-    }
-    .archive-row .date-chip {
-      grid-column: 1;
-      justify-self: start;
-      min-width: 0;
-    }
-    .archive-row__main {
-      grid-column: 1;
-    }
-    .archive-row__arrow {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-    }
   }
 
   /* Audio player: accent button + progress */
@@ -1439,10 +1345,6 @@ html.lenis body {
   }
 }
 
-/* A page that ends with an archive band runs straight into the footer. */
-main:has(> .archive-band:last-child) + footer {
-  margin-top: 0;
-}
 
 @layer components {
   .time-chip__label {
@@ -1453,5 +1355,368 @@ main:has(> .archive-band:last-child) + footer {
     letter-spacing: 0;
     text-transform: none;
     color: var(--gray-600);
+  }
+}
+
+/* ================================================================== */
+/* Daily Bread: two columns from 1024px (devotional + sticky archive  */
+/* panel); below 1024px a week calendar instead. Never both at once.  */
+/* ================================================================== */
+@layer components {
+  .daily-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .archive-panel {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .daily-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem);
+      gap: 3rem;
+      align-items: start;
+    }
+    .archive-panel {
+      display: block;
+      position: sticky;
+      top: calc(76px + 1.5rem); /* below the sticky header */
+      max-height: calc(100svh - 76px - 3rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0.25rem 0.25rem 0.5rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    .daily-layout {
+      gap: 4.5rem;
+    }
+  }
+  .side-list {
+    border-top: 1px solid var(--gray-300);
+  }
+  .side-list > li {
+    border-bottom: 1px solid var(--gray-300);
+  }
+  .side-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    transition: background-color 0.2s;
+  }
+  .side-row:hover {
+    background: var(--band);
+  }
+  .side-row:hover .side-row__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 4px;
+  }
+  .side-row:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--accent-strong);
+  }
+  .side-row[aria-current='page'] {
+    background: var(--accent-tint);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .side-row__date {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--gray-600);
+  }
+  .side-row__title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .side-row[aria-current='page'] .side-row__title {
+    font-weight: 700;
+  }
+  .side-row[aria-current='page'] .side-row__date {
+    color: var(--accent-strong);
+  }
+
+  /* While the next devotional loads, the previous one stays, dimmed. */
+  .is-refreshing {
+    opacity: 0.55;
+    transition: opacity 0.2s;
+  }
+
+  /* ---- Week calendar (below 1024px) ---- */
+  .week-cal {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  .week-cal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .week-cal__title {
+    flex: 1;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .week-cal__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+    transition: background-color 0.2s, opacity 0.2s;
+  }
+  .week-cal__arrow:hover:not([aria-disabled]) {
+    background: color-mix(in srgb, var(--accent) 18%, var(--paper));
+  }
+  .week-cal__arrow[aria-disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .week-cal__arrow:focus-visible,
+  .week-cal__day:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+  }
+  .week-cal__viewport {
+    margin-top: 1rem;
+    overflow: hidden;
+    touch-action: pan-y; /* horizontal swipes are ours, vertical scroll stays native */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .week-cal__row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    padding: 0.35rem 0; /* room for focus rings */
+  }
+  .week-cal__row.is-from-right {
+    animation: week-in-right 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .week-cal__row.is-from-left {
+    animation: week-in-left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes week-in-right {
+    from { transform: translateX(40%); opacity: 0; }
+  }
+  @keyframes week-in-left {
+    from { transform: translateX(-40%); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .week-cal__row.is-from-right,
+    .week-cal__row.is-from-left {
+      animation: none;
+    }
+  }
+  .week-cal__cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .week-cal__initial {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--gray-600);
+  }
+  .week-cal__day {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .week-cal__day:hover:not([aria-disabled]):not([aria-pressed='true']) {
+    background: var(--accent-tint);
+  }
+  .week-cal__day[aria-disabled] {
+    color: var(--gray-500);
+    font-weight: 400;
+    cursor: default;
+  }
+  .week-cal__day[aria-current='date'] {
+    box-shadow: inset 0 0 0 1.5px var(--gray-500);
+  }
+  .week-cal__day[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: none;
+  }
+  .week-cal__day[aria-current='date'][aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--accent);
+  }
+  .week-cal__day[aria-pressed='true']:focus-visible {
+    box-shadow: var(--focus);
+  }
+  .week-cal__dot {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .week-cal__day[aria-pressed='true'] .week-cal__dot {
+    background: var(--on-accent);
+  }
+  .week-cal__empty {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+  }
+}
+
+/* ================================================================== */
+/* Pengumuman: one week at a time, plain list items (no cards).        */
+/* ================================================================== */
+@layer components {
+  .week-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .week-nav__range {
+    min-width: 11rem;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .week-nav__today {
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent-strong);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  .week-nav__today:hover {
+    background: var(--accent-tint);
+  }
+  .week-nav__today:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+  }
+
+  .ann-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-top: 1rem;
+  }
+  /* 1.5px separators drawn as lines: Chrome rounds border widths down to 1px. */
+  .ann-list {
+    position: relative;
+    padding-top: 1.5px;
+  }
+  .ann-list::before,
+  .ann-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--border-strong);
+  }
+  .ann-list::before {
+    top: 0;
+  }
+  .ann-item {
+    position: relative;
+    padding: 2rem 0;
+    scroll-margin-top: 96px;
+  }
+  .ann-item::after {
+    bottom: 0;
+  }
+  .ann-item:target .ann-item__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  .ann-item__permalink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0 0.25rem;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+  }
+  .ann-item__permalink:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-underline-offset: 4px;
+  }
+  .ann-item__title {
+    margin-top: 0.6rem;
+    font-size: clamp(1.35rem, 4vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .ann-item__body {
+    margin-top: 0.85rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .ann-item__body.is-clamped {
+    max-height: calc(1.05rem * 1.7 * 6);
+    overflow: hidden;
+  }
+  .ann-item__body.has-more {
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  }
+  .ann-item__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    margin-top: 0.25rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+  }
+  .ann-item__more:hover {
+    color: var(--accent-strong);
+  }
+  .ann-item__image {
+    display: block;
+    width: 100%;
+    max-width: 36rem;
+    height: auto;
+    margin-top: 1.25rem;
+    border-radius: 0.85rem;
   }
 }

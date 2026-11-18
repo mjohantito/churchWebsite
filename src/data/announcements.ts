@@ -17,31 +17,71 @@ export async function listGroups(): Promise<GroupView[]> {
   return data ?? [];
 }
 
-/** Published announcements, newest first, optionally for one group (by slug). */
-export async function listAnnouncements(groupSlug?: string | null, limit = 50): Promise<AnnouncementView[]> {
-  if (USE_MOCK) {
-    const all = mockAnnouncements();
-    return groupSlug ? all.filter((a) => a.group?.slug === groupSlug) : all;
-  }
-  const groups = await listGroups();
-  const byId = new Map(groups.map((g) => [g.id, g]));
-  const ids = groupSlug ? groups.filter((g) => g.slug === groupSlug).map((g) => g.id) : groups.map((g) => g.id);
-  if (ids.length === 0) return [];
+const COLUMNS = 'id, group_id, title_id, title_en, body_id, body_en, image_path, published_at, week_start';
 
-  const { data, error } = await getSupabase()
-    .from('announcements')
-    .select('id, group_id, title_id, title_en, body_id, body_en, image_path, published_at')
-    .eq('status', 'published')
-    .in('group_id', ids)
-    .order('published_at', { ascending: false })
-    .limit(limit);
-  if (error) fail('listAnnouncements', error);
-  return (data ?? []).map((r) => ({
+type Row = {
+  id: string; group_id: string; title_id: string; title_en: string | null; body_id: string; body_en: string | null;
+  image_path: string | null; published_at: string | null; week_start: string;
+};
+
+function toView(r: Row, byId: Map<string, GroupView>): AnnouncementView {
+  return {
     id: r.id,
     group: byId.get(r.group_id) ?? null,
     title: loc(r.title_id, r.title_en),
     body: loc(r.body_id, r.body_en),
     image_url: publicFileUrl('announcement-images', r.image_path),
     published_at: r.published_at ?? new Date(0).toISOString(),
-  }));
+    week_start: r.week_start,
+  };
+}
+
+/**
+ * Week navigator bounds: the distinct week-start Sundays (YYYY-MM-DD) that have at
+ * least one published announcement, oldest first. Includes future weeks
+ * as soon as something is published for them.
+ */
+export async function listAnnouncementWeeks(): Promise<string[]> {
+  if (USE_MOCK) return [...new Set(mockAnnouncements().map((a) => a.week_start))].sort();
+  const { data, error } = await getSupabase().rpc('announcement_weeks');
+  if (error) fail('listAnnouncementWeeks', error);
+  return data ?? [];
+}
+
+/**
+ * One week's published announcements (active groups only), in staff order:
+ * sort_order, then creation time. Group filtering happens on the page.
+ */
+export async function listAnnouncementsForWeek(weekStart: string): Promise<AnnouncementView[]> {
+  if (USE_MOCK) return mockAnnouncements().filter((a) => a.week_start === weekStart);
+  const groups = await listGroups();
+  const byId = new Map(groups.map((g) => [g.id, g]));
+  if (groups.length === 0) return [];
+  const { data, error } = await getSupabase()
+    .from('announcements')
+    .select(COLUMNS)
+    .eq('status', 'published')
+    .eq('week_start', weekStart)
+    .in('group_id', groups.map((g) => g.id))
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
+  if (error) fail('listAnnouncementsForWeek', error);
+  return (data ?? []).map((r) => toView(r, byId));
+}
+
+/** One published announcement (detail route / direct links). */
+export async function getAnnouncement(id: string): Promise<AnnouncementView | null> {
+  if (USE_MOCK) return mockAnnouncements().find((a) => a.id === id) ?? null;
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const groups = await listGroups();
+  const byId = new Map(groups.map((g) => [g.id, g]));
+  const { data, error } = await getSupabase()
+    .from('announcements')
+    .select(COLUMNS)
+    .eq('status', 'published')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) fail('getAnnouncement', error);
+  return data && byId.has(data.group_id) ? toView(data, byId) : null;
 }

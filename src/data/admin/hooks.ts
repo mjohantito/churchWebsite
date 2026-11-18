@@ -9,6 +9,7 @@ import { deleteSubmission, getSubmission, inboxSummary, listSubmissions, updateS
 import { getRosterCells, listRoles, saveRole, saveRosterCells, type DutyRole, type RosterCells } from './roster';
 import { listAllGroups, saveGroup, type Group } from './groups';
 import { listStaff } from './staff';
+import { copyAnnouncementsToNextWeek, listWeekAnnouncements, reorderAnnouncements } from './announcements';
 import { deleteService, getService, listAllServices, saveService, swapServiceOrder, updateServiceFlags, type ServiceInput, type TimeInput } from './services';
 
 /** Public query keys (src/data/queries.ts) affected by each admin table. */
@@ -33,6 +34,7 @@ export const adminKeys = {
   roster: (week: string) => ['admin', 'roster', week] as const,
   groups: ['admin', 'groups'] as const,
   staff: ['admin', 'staff'] as const,
+  announcementWeek: (week: string) => ['admin', 'announcements', 'week', week] as const,
   services: ['admin', 'services', 'list'] as const,
   service: (id: string) => ['admin', 'services', 'item', id] as const,
 };
@@ -73,6 +75,27 @@ export function useDeleteContent<T extends ContentTable>(table: T) {
   return useMutation({
     mutationFn: (row: Row<T>) => deleteContent(table, row),
     onSuccess: () => invalidate(table, PUBLIC_KEYS[table]),
+  });
+}
+
+/* ---------------- announcements (week view) ---------------- */
+
+export const useWeekAnnouncements = (week: string) =>
+  useQuery({ queryKey: adminKeys.announcementWeek(week), queryFn: () => listWeekAnnouncements(week), staleTime: 0 });
+
+export function useReorderAnnouncements() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: ({ week, ids }: { week: string; ids: string[] }) => reorderAnnouncements(week, ids),
+    onSuccess: () => invalidate('announcements', PUBLIC_KEYS.announcements),
+  });
+}
+
+export function useCopyAnnouncements() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: (ids: string[]) => copyAnnouncementsToNextWeek(ids),
+    onSuccess: () => invalidate('announcements', PUBLIC_KEYS.announcements),
   });
 }
 

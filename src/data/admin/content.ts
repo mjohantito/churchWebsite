@@ -24,7 +24,7 @@ export const CONTENT: Record<ContentTable, Config> = {
     files: [{ column: 'file_path', bucket: 'sermon-slides' }],
   },
   announcements: {
-    order: [{ column: 'published_at', ascending: false }, { column: 'created_at', ascending: false }],
+    order: [{ column: 'week_start', ascending: false }, { column: 'sort_order', ascending: true }, { column: 'created_at', ascending: true }],
     files: [{ column: 'image_path', bucket: 'announcement-images' }],
   },
 };
@@ -65,5 +65,12 @@ export async function deleteContent<T extends ContentTable>(table: T, row: Row<T
   const deleted = unwrap(await untyped().from(table).delete().eq('id', (row as { id: string }).id).select('id')) as unknown[];
   if (!deleted.length) throw new AdminError('forbidden');
   const r = row as Record<string, string | null>;
-  await Promise.all(CONTENT[table].files.map((f) => removeFile(f.bucket, r[f.column])));
+  // A copied announcement shares its image with the original: keep a file
+  // that another row still points to.
+  await Promise.all(CONTENT[table].files.map(async (f) => {
+    const path = r[f.column];
+    if (!path) return;
+    const users = unwrap(await untyped().from(table).select('id').eq(f.column, path).limit(1)) as unknown[];
+    if (users.length === 0) await removeFile(f.bucket, path);
+  }));
 }

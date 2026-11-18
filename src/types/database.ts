@@ -23,10 +23,12 @@ export type Database = {
           id: string
           image_path: string | null
           published_at: string | null
+          sort_order: number
           status: Database["public"]["Enums"]["content_status"]
           title_en: string | null
           title_id: string
           updated_at: string
+          week_start: string
         }
         Insert: {
           body_en?: string | null
@@ -36,10 +38,12 @@ export type Database = {
           id?: string
           image_path?: string | null
           published_at?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["content_status"]
           title_en?: string | null
           title_id: string
           updated_at?: string
+          week_start?: string
         }
         Update: {
           body_en?: string | null
@@ -49,10 +53,12 @@ export type Database = {
           id?: string
           image_path?: string | null
           published_at?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["content_status"]
           title_en?: string | null
           title_id?: string
           updated_at?: string
+          week_start?: string
         }
         Relationships: [
           {
@@ -478,6 +484,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      announcement_weeks: { Args: never; Returns: string[] }
+      copy_announcements_to_next_week: {
+        Args: { p_ids: string[] }
+        Returns: number
+      }
+      reorder_announcements: {
+        Args: { p_ids: string[]; p_week: string }
+        Returns: number
+      }
       save_church_service: {
         Args: { p_id: string; p_service: Json; p_times: Json }
         Returns: string

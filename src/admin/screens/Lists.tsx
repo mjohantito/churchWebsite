@@ -1,10 +1,7 @@
-// The four content list screens, built on ContentList.
-import { useSearchParams } from 'react-router-dom';
+// Content list screens built on ContentList (announcements have their own week view: Announcements.tsx).
 import { useTranslation } from 'react-i18next';
-import { useAllGroups } from '../../data/admin/hooks';
 import { useLocalized } from '../../lib/useLocalized';
 import { ContentList } from './ContentList';
-import { SelectField } from '../ui';
 
 const useDate = () => {
   const { formatDate } = useLocalized();
@@ -38,28 +35,3 @@ export function WeeklyList() {
   );
 }
 
-export function AnnouncementList() {
-  const { t } = useTranslation();
-  const { lang } = useLocalized();
-  const [params, setParams] = useSearchParams();
-  const group = params.get('group') ?? '';
-  const groups = useAllGroups();
-  const byId = new Map((groups.data ?? []).map((g) => [g.id, g.name]));
-  const fmt = (iso: string | null) =>
-    iso ? new Intl.DateTimeFormat(lang === 'id' ? 'id-ID' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(new Date(iso)) : '—';
-  return (
-    <ContentList
-      table="announcements"
-      title={t('admin.nav.announcements')}
-      basePath="/admin/announcements"
-      newLabel={t('admin.announcements.new')}
-      filter={group ? { group_id: group } : undefined}
-      filters={
-        <SelectField label={t('admin.announcements.group')} className="max-w-xs" value={group}
-          options={[{ value: '', label: t('admin.announcements.allGroups') }, ...(groups.data ?? []).map((g) => ({ value: g.id, label: g.name }))]}
-          onChange={(v) => setParams(v ? { group: v } : {})} />
-      }
-      describe={(r) => ({ meta: fmt(r.published_at), primary: r.title_id, secondary: byId.get(r.group_id) })}
-    />
-  );
-}

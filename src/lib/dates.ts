@@ -1,10 +1,11 @@
 // Dates are plain 'YYYY-MM-DD' strings in church local time (Asia/Jakarta).
 
-const TZ = 'Asia/Jakarta';
+// Weeks for Daily Bread and Pengumuman (Sunday to Saturday) live in ./week.
+import { jakartaDate } from './week';
 
 /** Today's date in Kediri, as YYYY-MM-DD. */
 export function jakartaToday(now = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  return jakartaDate(now);
 }
 
 export function isIsoDate(value: string | undefined | null): value is string {
@@ -19,7 +20,7 @@ export function addDays(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Monday of the week containing `iso` (ISO weeks start on Monday). */
+/** Monday of the week containing `iso`. Duty roster only (its weeks start on Monday). */
 export function mondayOf(iso: string): string {
   const dow = new Date(`${iso}T00:00:00Z`).getUTCDay(); // 0 = Sunday
   return addDays(iso, -((dow + 6) % 7));
