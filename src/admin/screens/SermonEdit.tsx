@@ -6,6 +6,8 @@ import { useContentEditor } from '../useContentEditor';
 import { EditorFrame } from '../EditorFrame';
 import { FileField } from '../FileField';
 import { Bilingual, Card, MarkdownField, TextField } from '../ui';
+import { Icon } from '../../components/Icon';
+import { sermonSlug } from '../../lib/sermonSlug';
 import { clean, date, maxLen, orNull, requiredMax } from '../validate';
 import i18n from '../../i18n';
 
@@ -42,9 +44,19 @@ export default function SermonEdit() {
   });
   const { form, set, errors } = ed;
   const videoId = parseYouTubeId(form.youtube);
+  const saved = ed.saved;
 
   return (
     <EditorFrame editor={ed} title={ed.isNew ? t('admin.sermons.new') : t('admin.sermons.edit')} back={{ to: BASE, label: t('admin.nav.sermons') }}>
+      {saved && saved.status === 'published' && (
+        <p>
+          <a href={`/sermons/${sermonSlug(saved)}`} target="_blank" rel="noopener noreferrer" className="abtn abtn--secondary">
+            <Icon name="arrow-right-up-linear" className="h-5 w-5" />
+            {t('admin.sermons.viewOnSite')}
+            <span className="sr-only">{t('a11y.opensNewTab')}</span>
+          </a>
+        </p>
+      )}
       <Card>
         <Bilingual render={(l) => (
           <TextField label={t('admin.sermons.titleField')} required={l === 'id'} lang={l}

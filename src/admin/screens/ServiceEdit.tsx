@@ -57,11 +57,11 @@ function validate(f: Form, fixed: boolean): Errors {
     e.description_id = maxLen(f.description_id, 2000);
     e.description_en = maxLen(f.description_en, 2000);
   }
-  if (f.cta_type !== 'none') {
+  if (!fixed && f.cta_type !== 'none') {
     e.cta_label_id = requiredMax(f.cta_label_id, 80);
     e.cta_label_en = maxLen(f.cta_label_en, 80);
   }
-  if (f.cta_type === 'link') {
+  if (!fixed && f.cta_type === 'link') {
     e.cta_url = !f.cta_url.trim() ? msg('admin.validation.required')
       : !/^(https?:\/\/\S+|\/\S*|mailto:\S+|tel:[+\d\s()-]+)$/i.test(f.cta_url.trim()) ? msg('admin.services.urlInvalid')
       : maxLen(f.cta_url, 500);
@@ -133,10 +133,11 @@ export default function ServiceEdit() {
       show_on_homepage: form.show_on_homepage,
       visible: form.visible,
       weekly_kind: form.weekly_kind || null,
-      cta_type: form.cta_type,
-      cta_label_id: form.cta_type === 'none' ? null : form.cta_label_id.trim(),
-      cta_label_en: form.cta_type === 'none' ? null : form.cta_label_en.trim() || null,
-      cta_url: form.cta_type === 'link' ? form.cta_url.trim() : null,
+      // The fixed Sunday button is set by a migration and locked by a trigger: resend it unchanged.
+      cta_type: fixed ? q.data!.cta_type : form.cta_type,
+      cta_label_id: fixed ? q.data!.cta_label_id : form.cta_type === 'none' ? null : form.cta_label_id.trim(),
+      cta_label_en: fixed ? q.data!.cta_label_en : form.cta_type === 'none' ? null : form.cta_label_en.trim() || null,
+      cta_url: fixed ? q.data!.cta_url : form.cta_type === 'link' ? form.cta_url.trim() : null,
     };
     const times: TimeInput[] = sorted.map((r) => ({ day_of_week: r.day, start_time: `${r.hh}:${r.mm}`, label_id: r.label_id.trim() || null, label_en: r.label_en.trim() || null }));
     try {
@@ -259,7 +260,7 @@ export default function ServiceEdit() {
                 { value: 'prayer_list', label: t('admin.weekly.kinds.prayer_list') },
               ]}
               onChange={(v) => set('weekly_kind', v as Form['weekly_kind'])} />
-            <SelectField label={t('admin.services.ctaType')} value={form.cta_type}
+            <SelectField label={t('admin.services.ctaType')} value={form.cta_type} disabled={fixed}
               options={[
                 { value: 'none', label: t('admin.services.ctaNone') },
                 { value: 'form_choir', label: t('admin.services.ctaChoir') },
@@ -267,15 +268,16 @@ export default function ServiceEdit() {
               ]}
               onChange={(v) => set('cta_type', v as Form['cta_type'])} />
           </div>
+          {fixed && <p className="field-hint mt-3">{t('admin.services.ctaLocked')}</p>}
           {form.cta_type !== 'none' && (
             <div className="mt-6 space-y-5">
               <BilingualTabs errorIn={ctaErrorIn} render={(l) => (
-                <TextField label={t('admin.services.ctaLabel')} required={l === 'id'} lang={l} maxLength={80}
+                <TextField label={t('admin.services.ctaLabel')} required={l === 'id'} lang={l} maxLength={80} disabled={fixed}
                   value={l === 'id' ? form.cta_label_id : form.cta_label_en} error={l === 'id' ? errors.cta_label_id : errors.cta_label_en}
                   onChange={(v) => set(l === 'id' ? 'cta_label_id' : 'cta_label_en', v)} />
               )} />
               {form.cta_type === 'link' && (
-                <TextField label={t('admin.services.ctaUrl')} required hint={t('admin.services.ctaUrlHint')} type="url" inputMode="url"
+                <TextField label={t('admin.services.ctaUrl')} required hint={t('admin.services.ctaUrlHint')} type="url" inputMode="url" disabled={fixed}
                   value={form.cta_url} error={errors.cta_url} maxLength={500} onChange={(v) => set('cta_url', v)} />
               )}
             </div>

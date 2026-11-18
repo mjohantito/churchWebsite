@@ -1,6 +1,6 @@
 // TanStack Query hooks: the ONLY way components get data.
-import { useQuery, type QueryClient } from '@tanstack/react-query';
-import { getLatestSermon } from './sermons';
+import { useInfiniteQuery, useQuery, type QueryClient } from '@tanstack/react-query';
+import { getFileSize, getLatestSermon, getSermonBySlug, getSermonNeighbours, listSermonYears, listSermons } from './sermons';
 import { getNextWeeklyItem } from './weekly';
 import { getCurrentDailyBread, getDailyBreadByDate, listDailyBread, listDailyBreadDates } from './dailyBread';
 import { getAnnouncement, listAnnouncementWeeks, listAnnouncementsForWeek, listGroups } from './announcements';
@@ -12,6 +12,10 @@ import type { WeeklyKind } from './types';
 // Keys never contain "today": the prerendered cache must match on hydration.
 export const queryKeys = {
   latestSermon: ['sermons', 'latest'] as const,
+  sermonList: (q: string, year: number | null) => ['sermons', 'list', q, year] as const,
+  sermonYears: ['sermons', 'years'] as const,
+  sermon: (slug: string) => ['sermons', 'item', slug] as const,
+  sermonNeighbours: (id: string) => ['sermons', 'neighbours', id] as const,
   nextWeekly: (kind: WeeklyKind) => ['weekly', 'next', kind] as const,
   dailyBreadCurrent: ['daily-bread', 'current'] as const,
   dailyBreadByDate: (date: string) => ['daily-bread', 'date', date] as const,
@@ -60,6 +64,26 @@ export function useSundayTimes() {
 }
 
 export const useLatestSermon = () => useQuery({ queryKey: queryKeys.latestSermon, queryFn: getLatestSermon });
+
+/** /sermons list: pages of 10 ("Muat lebih banyak"), filtered by search and year. */
+export const useSermonList = (q: string, year: number | null) =>
+  useInfiniteQuery({
+    queryKey: queryKeys.sermonList(q, year),
+    queryFn: ({ pageParam }) => listSermons({ q, year, page: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (last, all) => (last.hasMore ? all.length : undefined),
+  });
+
+export const useSermonYears = () => useQuery({ queryKey: queryKeys.sermonYears, queryFn: listSermonYears, staleTime: 10 * 60_000 });
+
+export const useSermon = (slug: string) => useQuery({ queryKey: queryKeys.sermon(slug), queryFn: () => getSermonBySlug(slug) });
+
+export const useSermonNeighbours = (s: { id: string; preached_on: string } | null | undefined) =>
+  useQuery({ queryKey: queryKeys.sermonNeighbours(s?.id ?? ''), queryFn: () => getSermonNeighbours(s!), enabled: Boolean(s) });
+
+/** Byte size of a public file (slides), via a HEAD request. */
+export const useFileSize = (url: string | null) =>
+  useQuery({ queryKey: ['file-size', url], queryFn: () => getFileSize(url!), enabled: Boolean(url), staleTime: Infinity, retry: false });
 
 export const useNextWeeklyItem = (kind: WeeklyKind) =>
   useQuery({ queryKey: queryKeys.nextWeekly(kind), queryFn: () => getNextWeeklyItem(kind) });

@@ -174,6 +174,7 @@ const adminEn: Shape<AdminDictionary> = {
     exists: 'There is already a devotional for this date. Saving will fail.',
   },
   sermons: {
+    viewOnSite: 'View on site',
     new: 'New sermon',
     edit: 'Edit sermon',
     titleField: 'Sermon title',
@@ -264,6 +265,7 @@ const adminEn: Shape<AdminDictionary> = {
     hidden: 'Hidden',
     noTimes: 'No times yet',
     fixedNote: 'Ibadah Minggu is fixed. You can only change its times.',
+    ctaLocked: 'The Sunday Service button (Sermon materials) is fixed and cannot be changed here.',
     visible: 'Shown on the site',
     onHomepage: 'Shown on the homepage',
     visibilityHint: '"Shown on the site" controls the Church Services page and footer; "Shown on the homepage" controls the homepage card.',

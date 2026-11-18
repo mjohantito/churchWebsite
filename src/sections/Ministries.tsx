@@ -40,7 +40,7 @@ export function Ministries() {
       <div className="mt-16 grid gap-12 sm:mt-24 lg:grid-cols-12 lg:gap-x-10">
         <div className="lg:col-span-3">
           <p className="ministries-label" data-reveal>
-            <Icon name="users-group-rounded-linear" className="h-9 w-9 shrink-0 text-accent" />
+            <Icon name="users-group-rounded-linear" className="h-9 w-9 shrink-0 text-accent-strong" />
             <span>{t('ministries.label')}</span>
           </p>
         </div>

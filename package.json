@@ -8,6 +8,7 @@
     "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview",
     "icons": "node scripts/build-icons.mjs",
+    "media": "node scripts/build-media.mjs",
     "test": "node --test scripts/week.test.mjs",
     "db:types": "supabase gen types typescript --remote --schema public > src/types/database.ts",
     "db:push": "supabase db push --remote",
@@ -40,6 +41,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.6.2",
     "postcss": "^8.5.33",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
     "vite": "^5.4.21"

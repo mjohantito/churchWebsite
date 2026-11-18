@@ -31,8 +31,18 @@ Goal: onboard new members and serve existing member needs. Public site open to e
   - **Admin:** week view with up/down order and "copy to next week" (one or all, as drafts); the form picks the week ("Minggu ini", "Minggu depan" or any date, stored as the Sunday on or before it).
 - Homepage section 4 groups: Kids, Students, Youth, Young Adults, Adults
 - Mood: warm modern editorial + calm and reverent
-- Media: placeholders for now (photos, logo, YouTube sermon, daily bread audio). Real slides and summary text will be supplied for sermons.
-- Brand: black and white monochrome plus ONE accent, olive sage #5C6B4A (decided 2026-11-17). Defined once in src/index.css (`--accent`); `--accent-tint`, `--accent-strong` and `--on-accent` derive from it. Contrast on paper: accent 5.42:1, accent-strong 7.46:1, white on accent 5.74:1. Used sparingly, only for: the "Hari ini / Today" label, audio controls, active filter chips, announcement group tags, link underlines and hover, focus rings, and script accent words (accent-strong). Headlines, buttons and large backgrounds stay monochrome; no section is tinted.
+- Media: real photos since 2026-11-19 for the hero, Students, Youth and Young Adults. Kids, Adults, the logo and daily bread audio are still placeholders; real slides and summary text will be supplied for sermons.
+  - **Originals** live in `media-src/` (see its README). `npm run media` (sharp) builds AVIF and WebP at 480, 960 and 1600px (hero: 768, 1152, 1536, 2000) into `public/media/`, strips EXIF, and writes `src/lib/media.generated.json` (size, dominant colour, blurred preview).
+  - **Rendering:** `<picture>` with srcset/sizes and width/height; a per-photo focal point (`position`) in `src/lib/media.ts`.
+  - **Loading:** the hero is eager with `fetchpriority=high` plus a homepage-only `<link rel=preload>` (AVIF); the group photos are lazy.
+  - **Colour:** all real photos are full colour (sRGB, decided 2026-11-19). Only the labelled placeholders (Kids, Adults) stay monochrome.
+  - **Hero crop:** the hero's focal point is responsive (`--hero-focus` per breakpoint on `.arch`). The arch's right-edge bleed (`--arch-bleed`: 6vw below 1024px, 4vw above) is limited so the people in the photo always fit the visible arch. Screenshot checks are in docs/reference/hero-checks/.
+- Brand: black and white monochrome plus ONE accent, soft sage #9CAF88 (changed 2026-11-19; was olive #5C6B4A). Defined once in src/index.css; no other file may hardcode it.
+  - **Tokens:** `--accent` #9CAF88; `--on-accent` = ink #121212 (7.94:1 on sage; white would be 2.36 and fails); `--accent-strong` #56684A (5.70:1 on paper, 5.22 on band, 5.02 on tint); `--accent-tint` = 18% sage over paper (#E9EBE1).
+  - **Sage fills carry ink text:** the "Hari ini / Today" pill, the selected calendar day, active filter chips, the audio play button and the admin week chips. Fills that mark a state get a `--accent-strong` edge (3:1).
+  - **Everything that must be read or seen uses `--accent-strong`:** script accent words, group tags (tint background), links and underlines, focus rings (2px), meaningful icons, audio progress, the Today card border, the calendar dots, the active archive row, admin switches and tabs.
+  - **Decoration only may use `--accent` / `--accent-tint`:** small dots, washes, the archive mark.
+  - Headlines, buttons and large backgrounds stay monochrome; no section is tinted.
 - Daily Bread page pattern: one featured card (accent tint + 1px accent border) for the chosen devotional (FeaturedCard).
   - Daily Bread (revised 2026-11-18): from 1024px, two columns: the devotional on the left, the archive as a sticky side panel on the right (own scroll, open date highlighted, "Muat lebih banyak"). Below 1024px there is no archive: a week-strip calendar (WeekCalendar, Sunday to Saturday, swipe or arrow buttons) sits above the devotional; days with an entry have an accent dot; empty and future days are dimmed. It is bounded by the earliest entry's week and the current week (Asia/Jakarta), and fed by a dates-only query.
 - Weeks (decided 2026-11-18): the Daily Bread calendar and Pengumuman use SUNDAY-to-Saturday weeks in Asia/Jakarta, through one shared helper (src/lib/week.ts: getWeekStart, formatWeekRange, addWeeks; tests: `npm test`). The duty roster (Jadwal Petugas) keeps its Monday weeks.
@@ -49,7 +59,7 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 ## Art direction (awwwards-sites skill)
 
 - Visual thesis: a quiet, light-filled sanctuary rendered as a page. Paper-white background, heavy caps headlines with one script word, arch window motif (echoes church architecture), slow reverent motion.
-- Hero focal asset: arch-framed monochrome congregation or sanctuary photo (labelled placeholder with fixed aspect ratio until the real photo arrives).
+- Hero focal asset: arch-framed full-colour photo of the worship team on stage (real photo since 2026-11-19; responsive focal point so nobody is cut at the arch edge).
 - Type: heavy grotesque caps for headlines, brush-script accent word, clean sans body. Must support ID and EN well.
 - Color: monochrome (ink, paper, grays) plus one accent token, swappable in one place.
 - Motion: GSAP word-by-word heading reveals and hero intro. Lenis as the single smooth-scroll engine, wired to ScrollTrigger. All motion bypassed under prefers-reduced-motion.
@@ -59,7 +69,7 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 ## Homepage
 
 1. Hero: welcome, scripture (Roma 15:7), CTAs "I'm new" and "Need prayer" (each opens a form)
-2. Service cards (carousel): Sunday Service (next Sunday's material), Wednesday Night Prayer (next prayer list), Choir (join form)
+2. Service cards (carousel): Sunday Service (next Sunday's material, plus a secondary button "Materi khotbah / Sermon materials" → /sermons), Wednesday Night Prayer (next prayer list), Choir (join form)
 3. Most recent sermon: YouTube embed + slides + summary
 4. "There's a place for you": three-column layout for Kids, Students, Youth, Young Adults, Adults
 5. Footer: other pages, contact, service times, address and map link, language toggle
@@ -68,6 +78,13 @@ Goal: onboard new members and serve existing member needs. Public site open to e
 
 - Daily Bread (audio + text, daily)
 - Church Services
+- Materi khotbah / Sermon materials (/sermons): history of published sermons, newest first, grouped by year. Search by title or preacher, year chips, "Muat lebih banyak" (10 per page). Rows are plain items, not cards, separated by 1.5px lines, with:
+  - date, title and preacher
+  - a summary excerpt
+  - a lazy YouTube thumbnail
+  - Video / Slide / Ringkasan badges
+
+  The detail page is `/sermons/<date>-<title-slug>-<id8>`. It has a click-to-load youtube-nocookie player, the full summary, "Unduh slide" with type and size, and previous/next links; missing parts are hidden. It is linked from the Sunday card, the homepage "all sermons" link and the footer.
 - Baptisan (info + registration form)
 - Pengumuman (filterable by group)
 - Jadwal Petugas Ibadah (one weekly table)
@@ -92,7 +109,7 @@ Admin page: staff login, then manage sermons, daily bread, announcements, roster
 ## Build order
 
 1. Homepage only (frontend, mock data, form UI with stub submit) — DONE, with a revision pass for reference layout, typography and times
-2. Other pages (frontend, mock data, stub forms): partly done. Daily Bread, Pengumuman, Jadwal Petugas Ibadah and Church Services are built on real data (Church Services is managed in /admin/services). Baptisan and Contact Us are still "Coming soon" stubs.
+2. Other pages (frontend, mock data, stub forms): partly done. Daily Bread, Pengumuman, Jadwal Petugas Ibadah, Church Services and Materi khotbah (/sermons) are built on real data (Church Services is managed in /admin/services, sermons in /admin/sermons). Baptisan and Contact Us are still "Coming soon" stubs.
 3. Supabase: tables, form submissions, staff auth — DONE (see docs/backend-plan.md)
 4. Admin page — DONE (/admin, roles admin + editor; see docs/backend-plan.md)
 5. Email notification, deploy

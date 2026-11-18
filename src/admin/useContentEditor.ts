@@ -103,6 +103,8 @@ export function useContentEditor<T extends ContentTable, F extends object>(o: Op
 
   return {
     form, set, errors, dirty, status, guard,
+    /** the row as last loaded or saved (null for a new item) */
+    saved: (item.data ?? null) as Row<T> | null,
     isNew: !o.id,
     loading: Boolean(o.id) && item.isPending,
     loadError: item.isError ? item.error : null,

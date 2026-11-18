@@ -171,6 +171,7 @@ const adminId = {
     exists: 'Sudah ada renungan untuk tanggal ini. Menyimpan akan gagal.',
   },
   sermons: {
+    viewOnSite: 'Lihat di situs',
     new: 'Khotbah baru',
     edit: 'Ubah khotbah',
     titleField: 'Judul khotbah',
@@ -261,6 +262,7 @@ const adminId = {
     hidden: 'Disembunyikan',
     noTimes: 'Belum ada waktu',
     fixedNote: 'Ibadah Minggu bersifat tetap. Anda hanya dapat mengubah waktunya.',
+    ctaLocked: 'Tombol Ibadah Minggu (Materi khotbah) diatur tetap dan tidak dapat diubah di sini.',
     visible: 'Tampil di situs',
     onHomepage: 'Tampil di beranda',
     visibilityHint: '"Tampil di situs" mengatur halaman Church Services dan footer; "Tampil di beranda" mengatur kartu di beranda.',

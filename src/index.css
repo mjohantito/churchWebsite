@@ -61,20 +61,23 @@
   --font-label-tracking: 0.06em;
 
   /* ---------------------------------------------------------------
-     BRAND ACCENT: change --accent (and --on-accent) here; the rest derive.
-     Olive sage #5C6B4A. Contrast on paper #FAF8F5 (WCAG 2.x):
-       --accent         5.42:1 on paper, 4.75 on tint, 4.96 on band
-       --accent-strong  7.46:1 on paper, 6.55 on tint, 6.83 on band (small text)
-       --on-accent      white = 5.74:1 on --accent (ink would be 3.26, fails AA)
-     Use sparingly: labels, tags, active chips, audio controls, link
-     underlines, focus rings, script words. Never headlines, buttons or
-     large backgrounds.
+     BRAND ACCENT (the only place the accent hex lives). Soft sage #9CAF88.
+     Contrast (WCAG 2.x) on paper #FAF8F5 / band #F1EEE9 / tint #E9EBE1:
+       --accent         2.23 on paper: FILLS and decoration only, never text
+       --on-accent      ink #121212 = 7.94 on --accent (white would be 2.36)
+       --accent-strong  #56684A = 5.70 paper, 5.22 band, 5.02 tint, 5.95 surface
+                        (small text, links, meaningful icons, focus rings,
+                        visible borders, audio progress)
+       --accent-tint    18% sage over paper, a quiet wash (ink on it 15.55)
+     Rules: sage fills carry --on-accent text; anything that must be read
+     or seen as a boundary uses --accent-strong; dots and washes may use
+     --accent / --accent-tint. Never headlines, buttons or large backgrounds.
      --------------------------------------------------------------- */
-  --accent: #5c6b4a;
-  --on-accent: #ffffff;
-  --accent-strong: color-mix(in srgb, var(--accent) 75%, var(--ink)); /* #4A553C */
-  --accent-tint: color-mix(in srgb, var(--accent) 10%, var(--paper)); /* #EAEAE4 */
-  /* Accent variant for use on the ink footer (keep it light enough to read). */
+  --accent: #9caf88;
+  --on-accent: var(--ink);
+  --accent-strong: #56684a; /* darker sage tuned from --accent for >= 4.5:1 on paper */
+  --accent-tint: color-mix(in srgb, var(--accent) 18%, var(--paper)); /* #E9EBE1 */
+  /* Accent variant for use on the ink footer (13.65:1 on ink). */
   --accent-on-ink: color-mix(in srgb, var(--accent) 35%, var(--paper));
   /* Archive bands: slightly darker paper */
   --band: var(--gray-100);
@@ -456,7 +459,7 @@ html.lenis body {
   .nav-link:hover,
   .nav-link[aria-current='page'] {
     color: var(--ink);
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
   }
   .menu-link {
     display: flex;
@@ -582,7 +585,7 @@ html.lenis body {
     min-height: 44px;
     font-weight: 500;
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-decoration-thickness: 1.5px;
     text-underline-offset: 6px;
     transition: gap 0.3s var(--ease-out), color 0.2s;
@@ -654,14 +657,17 @@ html.lenis body {
   /* ---------------------------------------------------------------- */
   /* Hero arch                                                         */
   /* ---------------------------------------------------------------- */
-  /* The arch bleeds past the right edge of the viewport (clipped by .hero). */
+  /* The arch bleeds past the right edge of the viewport (clipped by .hero).
+     --arch-bleed is limited so the hero photo's people always fit in the
+     visible part of the arch (measured: more bleed cuts the right singer). */
   .hero__media {
     min-width: 0;
     padding-left: max(14%, var(--gutter));
   }
   .arch-stage {
+    --arch-bleed: 6vw;
     position: relative;
-    margin-right: -14vw;
+    margin-right: calc(-1 * var(--arch-bleed));
     padding-top: 1rem;
   }
   @media (min-width: 1024px) {
@@ -669,9 +675,25 @@ html.lenis body {
       padding-left: 0;
     }
     .arch-stage {
-      margin-right: -9vw;
+      --arch-bleed: 4vw;
     }
   }
+
+  /* HERO FOCAL POINT per arch shape (object-position of the photo).
+     Measured so both singers (and the two people beside them) sit fully
+     inside the visible arch with >= 12px around heads and shoulders.
+     Tune these, then re-check the screenshots in docs/reference/hero-checks/. */
+  .arch {
+    --hero-focus: 59% 50%; /* 360-413px */
+  }
+  @media (min-width: 414px) { .arch { --hero-focus: 59% 50%; } }
+  @media (min-width: 768px) { .arch { --hero-focus: 59% 50%; } }
+  @media (min-width: 1024px) { .arch { --hero-focus: 60.5% 50%; } }
+  @media (min-width: 1280px) { .arch { --hero-focus: 60.5% 50%; } }
+  @media (min-width: 1440px) { .arch { --hero-focus: 60.5% 50%; } }
+  @media (min-width: 1920px) { .arch { --hero-focus: 60.5% 50%; } }
+  @media (min-width: 2560px) { .arch { --hero-focus: 60% 50%; } }
+  @media (min-width: 3200px) { .arch { --hero-focus: 55% 50%; } } /* ultrawide: whole arch on screen */
   .arch,
   .arch-ring {
     /* huge radius on the top corners = perfect semicircle at any width; straight sides */
@@ -1060,11 +1082,11 @@ html.lenis body {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
   .filter-chip:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-strong);
   }
   .filter-chip[aria-current='page'] {
     background: var(--accent);
-    border-color: var(--accent);
+    border-color: var(--accent-strong); /* the active state needs a 3:1 edge */
     color: var(--on-accent);
   }
 
@@ -1125,7 +1147,7 @@ html.lenis body {
 @layer components {
   .prose-link {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-decoration-thickness: 1.5px;
     text-underline-offset: 4px;
   }
@@ -1143,7 +1165,7 @@ html.lenis body {
 @layer components {
   .featured-card {
     padding: 1.5rem 1.25rem 1.75rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--accent-strong);
     border-radius: 1.25rem;
     background: var(--accent-tint);
   }
@@ -1179,7 +1201,7 @@ html.lenis body {
     transition: text-decoration-color 0.2s;
   }
   .featured-card__title-link:hover {
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
   }
   .featured-card__meta {
     margin-top: 0.75rem;
@@ -1202,25 +1224,30 @@ html.lenis body {
     margin-top: 1.25rem;
   }
 
+  /* "Hari ini / Today": a sage fill, so its text is --on-accent (ink 7.94). */
   .accent-label {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 1.85rem;
+    padding: 0 0.8rem;
+    border-radius: 999px;
+    background: var(--accent);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--accent-strong);
+    color: var(--on-accent);
   }
   .accent-label__dot {
-    width: 0.55rem;
-    height: 0.55rem;
+    width: 0.45rem;
+    height: 0.45rem;
     border-radius: 999px;
-    background: var(--accent);
+    background: var(--on-accent);
   }
 
   .tag--accent {
-    background: var(--paper);
+    background: var(--accent-tint);
     border: 1px solid var(--accent);
     color: var(--accent-strong);
   }
@@ -1282,7 +1309,7 @@ html.lenis body {
     transition: background-color 0.2s;
   }
   .audio-player__btn:hover:not(:disabled) {
-    background: var(--accent-strong);
+    background: color-mix(in srgb, var(--accent) 85%, var(--ink)); /* ink on it 5.99 */
   }
   .audio-player__btn:disabled {
     opacity: 0.5;
@@ -1292,7 +1319,7 @@ html.lenis body {
     min-width: 8rem;
     height: 44px;
     background: transparent;
-    accent-color: var(--accent);
+    accent-color: var(--accent-strong);
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
@@ -1300,7 +1327,7 @@ html.lenis body {
   .audio-player__range::-webkit-slider-runnable-track {
     height: 6px;
     border-radius: 999px;
-    background: linear-gradient(to right, var(--accent) var(--p, 0%), var(--gray-300) var(--p, 0%));
+    background: linear-gradient(to right, var(--accent-strong) var(--p, 0%), var(--gray-300) var(--p, 0%));
   }
   .audio-player__range::-moz-range-track {
     height: 6px;
@@ -1310,7 +1337,7 @@ html.lenis body {
   .audio-player__range::-moz-range-progress {
     height: 6px;
     border-radius: 999px;
-    background: var(--accent);
+    background: var(--accent-strong);
   }
   .audio-player__range::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -1411,7 +1438,7 @@ html.lenis body {
   }
   .side-row:hover .side-row__title {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-underline-offset: 4px;
   }
   .side-row:focus-visible {
@@ -1420,7 +1447,7 @@ html.lenis body {
   }
   .side-row[aria-current='page'] {
     background: var(--accent-tint);
-    box-shadow: inset 3px 0 0 var(--accent);
+    box-shadow: inset 3px 0 0 var(--accent-strong);
   }
   .side-row__date {
     font-size: 0.75rem;
@@ -1477,7 +1504,7 @@ html.lenis body {
     transition: background-color 0.2s, opacity 0.2s;
   }
   .week-cal__arrow:hover:not([aria-disabled]) {
-    background: color-mix(in srgb, var(--accent) 18%, var(--paper));
+    background: color-mix(in srgb, var(--accent) 30%, var(--paper)) /* strong chevron 4.59 */;
   }
   .week-cal__arrow[aria-disabled] {
     opacity: 0.4;
@@ -1558,10 +1585,10 @@ html.lenis body {
   .week-cal__day[aria-pressed='true'] {
     background: var(--accent);
     color: var(--on-accent);
-    box-shadow: none;
+    box-shadow: inset 0 0 0 1.5px var(--accent-strong); /* 3:1 edge for the selected state */
   }
   .week-cal__day[aria-current='date'][aria-pressed='true'] {
-    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--accent);
+    box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--accent-strong), inset 0 0 0 1.5px var(--accent-strong);
   }
   .week-cal__day[aria-pressed='true']:focus-visible {
     box-shadow: var(--focus);
@@ -1574,7 +1601,7 @@ html.lenis body {
     height: 5px;
     margin-left: -2.5px;
     border-radius: 999px;
-    background: var(--accent);
+    background: var(--accent-strong); /* marks days that have a devotional */
   }
   .week-cal__day[aria-pressed='true'] .week-cal__dot {
     background: var(--on-accent);
@@ -1607,7 +1634,7 @@ html.lenis body {
   .week-nav__today {
     min-height: 44px;
     padding: 0 1rem;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--accent-strong);
     border-radius: 999px;
     color: var(--accent-strong);
     font-weight: 600;
@@ -1656,7 +1683,7 @@ html.lenis body {
   }
   .ann-item:target .ann-item__title {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-decoration-thickness: 2px;
     text-underline-offset: 6px;
   }
@@ -1672,7 +1699,7 @@ html.lenis body {
   .ann-item__permalink:hover {
     color: var(--accent-strong);
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-underline-offset: 4px;
   }
   .ann-item__title {
@@ -1704,7 +1731,7 @@ html.lenis body {
     font-weight: 600;
     color: var(--ink);
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-strong);
     text-decoration-thickness: 1.5px;
     text-underline-offset: 5px;
   }
@@ -1718,5 +1745,281 @@ html.lenis body {
     height: auto;
     margin-top: 1.25rem;
     border-radius: 0.85rem;
+  }
+}
+
+/* ================================================================== */
+/* Materi khotbah (/sermons): plain rows like the announcement list,    */
+/* no cards. Accent only on tags, focus and link underlines.            */
+/* ================================================================== */
+@layer components {
+  .sermon-search {
+    max-width: 30rem;
+  }
+  .sermon-search__row {
+    position: relative;
+    margin-top: 0.4rem;
+  }
+  .sermon-search__icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-600);
+    pointer-events: none;
+  }
+  .sermon-search__input {
+    padding-left: 2.75rem;
+    padding-right: 3rem;
+  }
+  .sermon-search__input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .sermon-search__clear {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    color: var(--gray-600);
+  }
+  .sermon-search__clear:hover {
+    color: var(--ink);
+  }
+  .sermon-search__clear:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+  }
+
+  .sermon-year + .sermon-year {
+    margin-top: 2.5rem;
+  }
+  .sermon-list {
+    position: relative;
+    margin-top: 1rem;
+    padding-top: 1.5px;
+  }
+  .sermon-list::before,
+  .sermon-list > li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--border-strong);
+  }
+  .sermon-list::before {
+    top: 0;
+  }
+  .sermon-list > li {
+    position: relative;
+  }
+  .sermon-list > li::after {
+    bottom: 0;
+  }
+  .sermon-row {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.9rem 1rem;
+    min-height: 44px;
+    padding: 1.25rem 0;
+    transition: background-color 0.2s;
+  }
+  @media (min-width: 640px) {
+    .sermon-row {
+      grid-template-columns: 12rem minmax(0, 1fr) auto;
+      gap: 1.5rem;
+      padding: 1.6rem 0.5rem;
+    }
+  }
+  .sermon-row:hover {
+    background: color-mix(in srgb, var(--band) 70%, transparent);
+  }
+  .sermon-row:hover .sermon-row__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-strong);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .sermon-row:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+    border-radius: 0.5rem;
+  }
+  .sermon-row__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+  .sermon-row__meta {
+    font-size: 0.85rem;
+    color: var(--gray-600);
+  }
+  .sermon-row__title {
+    font-size: clamp(1.1rem, 3.6vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .sermon-row__excerpt {
+    display: none;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--gray-700);
+  }
+  @media (min-width: 640px) {
+    .sermon-row__excerpt {
+      display: block;
+    }
+  }
+  .sermon-row__arrow {
+    display: none;
+    align-self: center;
+    color: var(--gray-500);
+  }
+  @media (min-width: 640px) {
+    .sermon-row__arrow {
+      display: block;
+    }
+  }
+  .sermon-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+  }
+  .sermon-badges .tag {
+    gap: 0.3rem;
+  }
+
+  .yt-thumb {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.6rem;
+    background: var(--gray-200);
+  }
+  .yt-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .yt-thumb--empty {
+    display: grid;
+    place-items: center;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+  }
+
+  /* Detail page */
+  .sermon-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+  }
+  .sermon-facts dd {
+    margin-top: 0.2rem;
+    font-size: 1.05rem;
+  }
+  .lite-yt {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 1.25rem;
+    background: var(--ink);
+  }
+  .lite-yt__button {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .lite-yt__button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .lite-yt__button:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--accent-strong);
+  }
+  .lite-yt__play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--on-accent);
+    box-shadow: 0 0 0 2px var(--accent-strong);
+    transition: transform 0.2s;
+  }
+  .lite-yt__button:hover .lite-yt__play {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+  .sermon-pager {
+    display: grid;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--gray-300);
+  }
+  @media (min-width: 640px) {
+    .sermon-pager {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .sermon-pager__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.5rem;
+  }
+  .sermon-pager__link--next {
+    text-align: right;
+    align-items: flex-end;
+  }
+  .sermon-pager__link .mini-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .sermon-pager__title {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .sermon-pager__link:hover .sermon-pager__title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent-strong);
+    text-underline-offset: 4px;
+  }
+  .sermon-pager__link:focus-visible {
+    outline: none;
+    box-shadow: var(--focus);
+  }
+}
+
+@layer components {
+  /* Built photos: the dominant colour + blurred preview (inline background) stay
+     behind the image until it has loaded. */
+  .media-img {
+    background-size: cover;
+    background-repeat: no-repeat;
   }
 }

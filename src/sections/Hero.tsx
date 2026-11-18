@@ -1,6 +1,7 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Media } from '../components/Media';
+import { HERO_SIZES } from '../lib/media';
 import { Icon } from '../components/Icon';
 import { useOpenForm } from '../components/forms/FormDialog';
 import { gsap, MOTION_OK_QUERY } from '../lib/motion';
@@ -188,7 +189,7 @@ export function Hero() {
           <div data-hero="arch-wrap" className="relative">
             <div data-hero="arch" data-intro className="arch">
               <div data-hero="arch-media" className="h-full w-full">
-                <Media id="heroSanctuary" eager fill tone="dark" sizes="(min-width: 1024px) 55vw, 90vw" />
+                <Media id="heroSanctuary" eager fill tone="dark" sizes={HERO_SIZES} />
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const dist = `${root}dist`;
-const { render, meta, PUBLIC_ROUTES } = await import(pathToFileURL(`${root}dist-ssr/entry-server.js`).href);
+const { render, meta, heroPreload, PUBLIC_ROUTES } = await import(pathToFileURL(`${root}dist-ssr/entry-server.js`).href);
 
 // Public site URL for absolute links (canonical, og:url, og:image, sitemap).
 // Set VITE_SITE_URL once you have a domain; on Vercel the production URL is used automatically.
@@ -57,6 +57,8 @@ for (const route of PUBLIC_ROUTES) {
   let out = withSeo(template, route).replace('<!--app-html-->', html);
   // Every page carries its build-time data (services for the footer; homepage content on /).
   out = out.replace('</body>', stateScript(state));
+  // Homepage only: start the hero photo download before the JS runs.
+  if (route === '/') out = out.replace('</head>', `${heroPreload()}\n</head>`);
   const file = route === '/' ? `${dist}/index.html` : `${dist}${route}/index.html`;
   mkdirSync(file.slice(0, file.lastIndexOf('/')), { recursive: true });
   writeFileSync(file, out);

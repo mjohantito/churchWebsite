@@ -31,10 +31,12 @@ export function mockNextWeekly(kind: WeeklyItemView['kind']): WeeklyItemView {
 }
 
 export function mockLatestSermon(): SermonView {
+  const date = addDays(today(), -dow());
   return {
     id: 'mock-sermon',
+    slug: `${date}-contoh-khotbah-00000000`,
     title: { id: 'Contoh judul khotbah: Pengharapan yang Hidup', en: 'Sample sermon title: A Living Hope' },
-    preached_on: addDays(today(), -dow()),
+    preached_on: date,
     preacher_name: null,
     scripture_ref: { id: '1 Petrus 1:3–9' },
     summary: {

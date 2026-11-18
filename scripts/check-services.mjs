@@ -74,7 +74,17 @@ for (const [who, c] of [['editor', editor], ['admin', admin]]) {
   check(Boolean(unfix.error), `${who} cannot un-fix Sunday`);
   const viaRpc = await c.rpc('save_church_service', { p_id: SUNDAY, p_service: { ...sundayRow, name_id: 'Ibadah Diubah' }, p_times: before });
   check(Boolean(viaRpc.error), `${who} cannot rename Sunday via save_church_service`);
+  // The Sunday button (Materi khotbah -> /sermons) is set by migration 20261119090000 and locked.
+  const ctaUrl = await c.from('church_services').update({ cta_url: '/contact-us' }).eq('id', SUNDAY);
+  check(Boolean(ctaUrl.error), `${who} cannot change the Sunday button's link`, ctaUrl.error?.message);
+  const ctaOff = await c.from('church_services').update({ cta_type: 'none', cta_label_id: null, cta_label_en: null, cta_url: null }).eq('id', SUNDAY);
+  check(Boolean(ctaOff.error), `${who} cannot remove the Sunday button`);
+  const ctaRpc = await c.rpc('save_church_service', { p_id: SUNDAY, p_service: { ...sundayRow, cta_label_id: 'Lain' }, p_times: before });
+  check(Boolean(ctaRpc.error), `${who} cannot relabel the Sunday button via save_church_service`);
 }
+const sundayNow = (await anon.from('church_services').select('cta_type, cta_label_id, cta_label_en, cta_url').eq('id', SUNDAY).single()).data;
+check(sundayNow?.cta_type === 'link' && sundayNow.cta_url === '/sermons' && sundayNow.cta_label_id === 'Materi khotbah' && sundayNow.cta_label_en === 'Sermon materials',
+  'public sees the Sunday button: Materi khotbah / Sermon materials -> /sermons', JSON.stringify(sundayNow));
 const adminDel = await admin.from('church_services').delete().eq('id', SUNDAY);
 check(Boolean(adminDel.error) && (await anon.from('church_services').select('id').eq('id', SUNDAY)).data?.length === 1, 'admin CANNOT delete Sunday (database trigger)', adminDel.error?.message);
 check(Boolean((await editor.from('church_services').insert({ name_id: 'Fake fixed', is_fixed: true, kind: 'sunday' })).error), 'nobody can create a second Sunday / fixed service from the app');

@@ -359,7 +359,7 @@
   font-weight: 700;
   color: var(--gray-600);
 }
-.lang-tab[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--accent); }
+.lang-tab[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--accent-strong); }
 
 /* Switch */
 .switch {
@@ -391,7 +391,7 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
   transition: transform 0.15s;
 }
-.switch[aria-checked='true'] .switch__track { background: var(--accent); }
+.switch[aria-checked='true'] .switch__track { background: var(--accent-strong); } /* on-state must read at 3:1 */
 .switch[aria-checked='true'] .switch__thumb { transform: translateX(1.1rem); }
 .switch:disabled { opacity: 0.5; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
@@ -448,7 +448,7 @@
 }
 .choice-chip:hover { border-color: var(--ink); }
 .choice-chip.is-on {
-  border-color: var(--accent);
+  border-color: var(--accent-strong);
   background: var(--accent);
   color: var(--on-accent);
 }

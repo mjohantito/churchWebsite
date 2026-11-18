@@ -20,7 +20,8 @@ export const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encod
 export const FALLBACK_SERVICES: ServiceView[] = [
   {
     id: 'fallback-sunday', kind: 'sunday', name: { id: 'Ibadah Minggu', en: 'Sunday Service' }, description: null,
-    show_on_homepage: true, weekly_kind: 'sunday_material', cta: { type: 'none', label: null, url: null },
+    show_on_homepage: true, weekly_kind: 'sunday_material',
+    cta: { type: 'link', label: { id: 'Materi khotbah', en: 'Sermon materials' }, url: '/sermons' },
     times: [
       { day: 0, time: '08:15', label: { id: 'Ibadah pagi', en: 'Morning service' } },
       { day: 0, time: '18:15', label: { id: 'Ibadah sore', en: 'Evening service' } },

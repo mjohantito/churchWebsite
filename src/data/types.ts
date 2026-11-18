@@ -26,6 +26,15 @@ export interface SermonView {
   summary: Localized | null;
   youtube_video_id: string | null;
   slides_url: string | null;
+  /** readable URL part for /sermons/:slug */
+  slug: string;
+}
+
+/** Previous / next sermon link on the detail page. */
+export interface SermonLink {
+  title: Localized;
+  preached_on: string;
+  slug: string;
 }
 
 export interface DailyBreadView {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { NAV } from '../config/site';
+import { FOOTER_PAGES } from '../config/site';
 import { CHURCH_INFO, MAPS_URL } from '../data/churchInfo';
 import { useLocalized } from '../lib/useLocalized';
 import { useServiceList } from '../data/queries';
@@ -28,7 +28,7 @@ export function Footer() {
           <nav aria-label={t('a11y.footerNav')} className="lg:col-span-3">
             <h2 className="footer-heading">{t('footer.pages')}</h2>
             <ul className="mt-4 space-y-1">
-              {NAV.map((item) => (
+              {FOOTER_PAGES.map((item) => (
                 <li key={item.path}>
                   <Link to={item.path} className="footer-link">
                     {t(item.key)}

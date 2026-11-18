@@ -96,6 +96,8 @@ Constraints:
 - `private.protect_service_time` (BEFORE UPDATE on `church_service_times`) rejects moving a time to another service.
 - `private.fixed_service_keeps_a_time` is a deferred constraint trigger (AFTER DELETE, `DEFERRABLE INITIALLY DEFERRED`). At commit it rejects any transaction that leaves the fixed service with no times. Replacing all times in one save works; removing the last time fails and is rolled back.
 
+**Sunday button (migration 20261119090000):** the fixed Sunday row's CTA is "Materi khotbah / Sermon materials" → `/sermons`. `private.protect_fixed_service` now also locks `cta_type`, `cta_label_*` and `cta_url` on the fixed row for signed-in requests, next to the existing `kind`, name and description locks. Migrations run with no signed-in user, so they can still set it. The admin form shows these fields read-only with a note, and resends the stored values on save.
+
 **Roles:** editors may insert, update and delete *time rows* (removing a time is part of editing a service). Deleting a whole service is admin-only (RLS), and the Sunday row can never be deleted (trigger).
 
 **Freshness:** the public site reads services through TanStack Query (`['services']`, 60 s stale time). Every pre-rendered page also carries the build-time copy for its footer, which is marked stale and refetched on load. Saving in the admin invalidates the admin and public queries, so changes show on the public site after a refresh.
@@ -162,6 +164,24 @@ Every announcement belongs to one Sunday-to-Saturday week (Asia/Jakarta). The pu
 
 Everything it creates is removed afterwards.
 
+## Sermons (/sermons)
+
+The table, RLS and admin screen are unchanged (from 20261117100000). Visitors read `status = 'published'` only; staff create and edit; admins delete. The existing index (`status`, `preached_on desc`) serves the list, so nothing was added.
+
+**URLs:** `/sermons/<preached_on>-<slug of title_id>-<first 8 of id>` (`src/lib/sermonSlug.ts`). It is resolved by date plus id prefix, so a renamed sermon keeps working; a bare uuid also works. Drafts and unknown slugs show "not found".
+
+**Queries:**
+- **List:** newest first by `preached_on`, then `id`. Search uses `ilike` on `title_id`, `title_en` and `preacher`; the term is reduced to letters, digits, spaces and hyphens before going into the `or()` filter. The year filter is a date range. Pages are 10 rows, fetched as 11 to know whether there is more.
+- **Year chips:** come from the published dates.
+- **Previous/next:** the neighbouring published sermon by (`preached_on`, `id`).
+- **Slide size:** a HEAD request to the public file. Supabase exposes `content-length` with `access-control-allow-origin: *`.
+
+**Sample data:** `scripts/sample-sermons.mjs add|remove` signs in as an admin from `.env.test-accounts` (`TEST_ADMIN_EMAIL` / `TEST_ADMIN_PASSWORD`; your own admin login works).
+- It adds 14 published sermons titled "Contoh: … / Sample: …" (2025–2026) and 1 draft, with fixed ids `00000000-0000-4000-8000-0000000009NN`, plus one sample PDF, `sermon-slides/contoh/contoh-slide-khotbah.pdf`.
+- Sample #4 has no video, #7 no slides and #9 no summary.
+- `remove` deletes exactly those rows and that file.
+- They were added on 2026-11-19 and kept on purpose for review; run `remove` before going live.
+
 ## Admin page (/admin)
 
 - **Separate chunk:** a code-split JS + CSS chunk, with its i18n text loaded alongside it. The public bundle does not include it. It uses its own calm shell: no Lenis, no scroll animations, `noindex`. The layout is a sidebar on wide screens and a drawer on phones.
@@ -169,7 +189,7 @@ Everything it creates is removed afterwards.
   - Dashboard
   - Inbox (filters, search, detail with call/email links, status, notes; admin: delete, CSV export)
   - Daily Bread
-  - Sermons (YouTube link parsed and previewed)
+  - Sermons (YouTube link parsed and previewed; "Lihat di situs" for published sermons)
   - Weekly Items
   - Announcements (week view: navigator, up/down order, copy one or all to next week as drafts; the form picks the week)
   - Duty Roster (week grid, Save, copy from last week; admin: manage roles)
@@ -186,7 +206,7 @@ Everything it creates is removed afterwards.
 ## Frontend data layer
 
 - `src/lib/supabase.ts`: the one client. `src/types/database.ts`: generated types.
-- `src/data/*.ts`: one function per resource (`getLatestSermon`, `getNextWeeklyItem`, `getCurrentDailyBread`, `getDailyBreadByDate`, `listDailyBread`, `listGroups`, `listAnnouncementWeeks`, `listAnnouncementsForWeek`, `getAnnouncement`, `listDailyBreadDates`, `getRoster`, `submitForm`, plus the auth helpers). Pages never import Supabase.
+- `src/data/*.ts`: one function per resource (`getLatestSermon`, `getNextWeeklyItem`, `getCurrentDailyBread`, `getDailyBreadByDate`, `listDailyBread`, `listGroups`, `listAnnouncementWeeks`, `listAnnouncementsForWeek`, `getAnnouncement`, `listDailyBreadDates`, `listSermons` (search + year + pages of 10), `listSermonYears`, `getSermonBySlug`, `getSermonNeighbours`, `getFileSize` (HEAD for the slide size), `getRoster`, `submitForm`, plus the auth helpers). Pages never import Supabase.
 - `src/data/queries.ts`: TanStack Query hooks with loading, error (with retry) and empty states.
 - The build prerenders the homepage with real data (`scripts/prerender.mjs`), so it is complete without JavaScript. The browser refreshes it on load. If the database is unreachable at build time, the build still succeeds and the data loads in the browser.
 
@@ -211,6 +231,7 @@ Files:
 - `supabase/migrations/20261118120000_announcement_weeks.sql`: announcements `week_start` + `sort_order` (backfill, Monday CHECK, index), `announcement_weeks`, `reorder_announcements`, `copy_announcements_to_next_week`
 - `supabase/migrations/20261118130000_announcement_order.sql`: renumbers `sort_order` 1..n per week; trigger that appends new or moved announcements at the end of their week
 - `supabase/migrations/20261118140000_announcement_weeks_sunday.sql`: weeks start on Sunday: Sunday CHECK, backfill, renumbered order, new default
+- `supabase/migrations/20261119090000_sunday_sermons_cta.sql`: Sunday button → /sermons; the trigger also locks the fixed row's CTA for app users
 - `supabase/seed.sql`: the homepage mock content plus sample daily bread, announcements and roster. Dates are relative to today, all text is marked "Contoh / Sample", and a few `draft` rows exist so the RLS check has something to hide. Safe to re-run.
 
 Commands (Supabase CLI, project already linked):

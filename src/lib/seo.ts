@@ -39,6 +39,10 @@ export function routeMeta(pathname: string, t: TFunction, formatDate?: (iso: str
       noindex: false,
     };
   }
+  // Sermon detail: SermonsPage sets the sermon's own title once it has loaded.
+  if (/^\/sermons\/[^/]+$/.test(path)) {
+    return { title: t('meta.pageTitle', { page: t('nav.sermons') }), description: t('meta.descriptions.sermons'), noindex: false };
+  }
   if (/^\/pengumuman\/[^/]+$/.test(path)) {
     return { title: t('meta.pageTitle', { page: t('nav.announcements') }), description: t('meta.descriptions.announcements'), noindex: false };
   }

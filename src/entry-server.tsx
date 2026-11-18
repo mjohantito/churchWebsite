@@ -7,8 +7,17 @@ import i18n, { DEFAULT_LANG, initI18n } from './i18n';
 import { createQueryClient } from './lib/queryClient';
 import { prefetchHomepage, prefetchServices } from './data/queries';
 import { PUBLIC_ROUTES, routeMeta } from './lib/seo';
+import { HERO_SIZES, MEDIA, srcSet } from './lib/media';
 
 export { PUBLIC_ROUTES };
+
+/** <head> preload for the homepage hero photo (AVIF; browsers without AVIF skip it). */
+export function heroPreload(): string {
+  const p = MEDIA.heroSanctuary.photo;
+  if (!p) return '';
+  const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return `<link rel="preload" as="image" type="image/avif" imagesrcset="${attr(srcSet(p, 'avif'))}" imagesizes="${attr(HERO_SIZES)}" fetchpriority="high">`;
+}
 
 /** Title / description / robots for a route, in the default language (ID). */
 export function meta(url: string) {

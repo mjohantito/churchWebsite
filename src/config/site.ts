@@ -15,6 +15,8 @@ export const NAV = [
 export const STUB_ROUTES = [
   { path: '/baptisan', key: 'nav.baptism' },
   { path: '/contact-us', key: 'nav.contact' },
-  { path: '/sermons', key: 'nav.sermons' },
 ] as const;
-export type NavKey = (typeof NAV)[number]['key'] | (typeof STUB_ROUTES)[number]['key'];
+
+// Footer "pages" list: the main navigation plus pages linked from content.
+export const FOOTER_PAGES = [...NAV, { path: '/sermons', key: 'nav.sermons' }] as const;
+export type NavKey = (typeof FOOTER_PAGES)[number]['key'] | (typeof STUB_ROUTES)[number]['key'];
